@@ -49,7 +49,8 @@
                                 v-model="filter[level.label]"
                                 type="checkbox"
                         >
-                        <label v-bind:for="level.label">{{ level.label }} ({{ Object.keys(level.results).length }})</label>
+                        <label v-bind:for="level.label">{{ level.label }} ({{ Object.keys(level.results).length
+                            }})</label>
                     </template>
                 </div>
 

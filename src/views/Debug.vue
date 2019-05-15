@@ -1,6 +1,10 @@
 <template>
   <pre>
-    hi
+    <ul>
+      <li v-for="(user, user_key) in users">
+        {{user.user_email}}
+      </li>
+    </ul>
   </pre>
 </template>
 <script>

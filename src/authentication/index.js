@@ -2,9 +2,8 @@ import AuthenticationContext from 'adal-angular/lib/adal.js';
 import store from '../store';
 
 const config = {
-    tenant: 'unnikrishnanp76wipro.onmicrosoft.com',
     clientId: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8',
-    redirectUri: 'http://localhost:3110/',
+    redirectUri: 'http://localhost:3110/dashboard',
     cacheLocation: 'localStorage'
 };
 
@@ -32,9 +31,7 @@ export default {
             }
         });
     },
-    /**
-     * @return {Promise.<String>} A promise that resolves to an ADAL token for resource access
-     */
+
     acquireToken() {
         return new Promise((resolve, reject) => {
             this.authenticationContext.acquireToken('<azure active directory resource id>', (error, token) => {
@@ -46,15 +43,11 @@ export default {
             });
         });
     },
-    /**
-     * Issue an interactive authentication request for the current user and the api resource.
-     */
+
     acquireTokenRedirect() {
         this.authenticationContext.acquireTokenRedirect('<azure active directory resource id>');
     },
-    /**
-     * @return {Boolean} Indicates if there is a valid, non-expired access token present in localStorage.
-     */
+
     isAuthenticated() {
         // getCachedToken will only return a valid, non-expired token.
         if (this.authenticationContext.getCachedToken(config.clientId)) {
