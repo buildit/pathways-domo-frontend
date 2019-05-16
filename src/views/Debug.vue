@@ -1,10 +1,12 @@
 <template>
-  <pre>
-    <ul>
-      <li v-for="(user, user_key) in users">
-        {{user.user_email}}
-      </li>
-    </ul>
+  <pre v-if="userMappings">
+    <button @click="fireAway(userMappings())">Push</button>
+    {{ userMappings() }}
+      <!--<ul>
+        <li v-for="(user, user_key) in users">
+          {{user.user_email}}|{{user.forecast_user_id}}
+        </li>
+      </ul>-->
   </pre>
 </template>
 <script>
@@ -26,9 +28,24 @@
                 'skillLevels',
                 'roles'
             ]),
+
         },
 
-        methods: {},
+        methods: {
+            userMappings: function () {
+                let result = [];
+                for (let u in this.users) {
+                    result.push({
+                        "username": this.users[u].user_email,
+                        "domoIdentifier": this.users[u].forecast_user_id.toString()
+                    });
+                }
+                return result;
+            },
+            fireAway: function (results) {
+                console.log(results);
+            }
+        },
 
     };
 </script>
