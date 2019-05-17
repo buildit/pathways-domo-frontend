@@ -12,6 +12,7 @@
 <script>
     import {mapState} from "vuex";
 
+    const pathwaysApi = require('../services/apiConfig');
     const fb = require('../services/firebaseDebug');
 
     export default {
@@ -43,7 +44,7 @@
                 return result;
             },
             fireAway: function (results) {
-                console.log(results);
+                pathwaysApi.default.updateUsers(results).then(r => console.log(r));
             }
         },
 
