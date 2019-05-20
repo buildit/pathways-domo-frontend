@@ -139,7 +139,8 @@ const store = new Vuex.Store({
         fetchUserProfile({commit, state}) {
             state.currentUser.email;
             fb.usersCollection.doc(state.currentUser.email).get().then(res => {
-                commit('setUserProfile', res.data());
+                console.log('committing ' + res.data.username);
+                commit('setUserProfile', res.data);
             }).catch(err => {
                 console.log(err);
             });

@@ -1,10 +1,12 @@
 import authentication from '../authentication';
 import store from '../store';
+import api from './apiConfig';
+
 
 const db = {
     collection: function (dataType) {
         console.log("requested " + dataType);
-        return new dbCollection();
+        return new dbCollection(dataType);
     }
 };
 
@@ -12,35 +14,38 @@ var dbCollection = function dbCollection(collectionType) {
     this.collectionType = collectionType;
 };
 
-dbCollection.prototype.doc = function docRef(value) {
-    console.log("reaching for " + value);
-    return new backendQuery(value);
+let backendQuery = function backendQuery(query, apiCall) {
+    this.query = query;
+    this.apiCall = apiCall;
 };
 
-var backendQuery = function backendQuery(query) {
-    this.query = query;
+dbCollection.prototype.doc = function docRef(value) {
+    console.log("reaching for " + value + " of type " + this.collectionType);
+    if (this.collectionType === 'users') {
+        return new backendQuery(value, api.User.get);
+    } else {
+        return new backendQuery(value);
+    }
 };
+
 
 backendQuery.prototype.get = function () {
     console.log("getting this " + this.query);
-    var newThing = "got " + this.query;
 
-    return new Promise(function (res, rej) {
-        res(new dataThing("Chrispydizzle"));
-    });
+    return this.apiCall(this.query);
 };
 
 backendQuery.prototype.get1 = function () {
     console.log("getting this" + this.query);
 };
 
-var dataThing = function(name) {
+var dataThing = function (name) {
     this.name = name;
-}
+};
 
-dataThing.prototype.data = function(){
-    return { name: this.name }
-}
+dataThing.prototype.data = function () {
+    return {name: this.name};
+};
 
 const usersCollection = db.collection('users');
 const rolesCollection = db.collection('roles');
@@ -49,7 +54,9 @@ const skillLevelsCollection = db.collection('skill_levels');
 const skillsCollection = db.collection('skills');
 
 const auth = authentication.authenticationContext;
-const currentUser = function() { return store.state.currentUser };
+const currentUser = function () {
+    return store.state.currentUser;
+};
 authentication.initialize().then((u) => {
     store.commit('setCurrentUser', authentication.getUserProfile());
     store.dispatch('fetchUserProfile');

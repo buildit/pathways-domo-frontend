@@ -8,8 +8,7 @@
                             <h2 v-if="userProfile">
                                 {{ fullName }} </h2>
                             <p v-if="userProfile">
-                                Forecast ID: {{ userProfile.forecast_user_id }} </p>
-
+                                Forecast ID: {{ userProfile.domoIdentifier }} </p>
                             <o-user-role-breakdown></o-user-role-breakdown>
                         </div>
 
@@ -87,7 +86,11 @@
                 'userGoals'
             ]),
             fullName: function () {
-                return this.currentUser.profile.name;
+                if (this.currentUser != null && this.currentUser.profile != null) {
+                    return this.currentUser.profile.name;
+                }
+
+                return null;
             },
             nextRoleLevels: function () {
                 let nextRoleLevels = {};

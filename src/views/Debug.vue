@@ -1,5 +1,7 @@
 <template>
   <pre v-if="userMappings">
+    {{getAllOfType()}}
+
     <button @click="fireAway(userMappings())">Push</button>
     {{ userMappings() }}
       <!--<ul>
@@ -33,6 +35,10 @@
         },
 
         methods: {
+            getAllOfType: function () {
+                let result = [];
+                return this.skillGroups;
+            },
             userMappings: function () {
                 let result = [];
                 for (let u in this.users) {
