@@ -1,6 +1,7 @@
 import firebase from 'firebase';
 import 'firebase/firestore';
 import store from '../store';
+
 // Initialize Firebase
 var config = {
     apiKey: "AIzaSyA4gu9dKjMhKv9afME2iMyIAFgU8oEamEk",
@@ -34,9 +35,30 @@ fbusersCollection.onSnapshot(querySnapshot => {
     store.commit('setUsers', tempArray);
 }); // skill groups
 
+fbskillGroupsCollection.onSnapshot(qs => {
+    let tempArray = {};
+
+    qs.forEach(doc => {
+        let user = doc.data();
+        tempArray[doc.id] = user;
+    });
+
+    store.commit('setSkillGroups', tempArray);
+});
+
+
+fbrolesCollection.onSnapshot(qs => {
+    let tempArray = {};
+
+    qs.forEach(doc => {
+        let user = doc.data();
+        tempArray[doc.id] = user;
+    });
+
+    store.commit('setRoles', tempArray);
+});
+
 export {
-    fbdb,
-    fbusersCollection,
     fbrolesCollection,
     fbskillGroupsCollection,
     fbskillLevelsCollection,

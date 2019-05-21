@@ -16,6 +16,8 @@ import Assessments from './views/Assessments';
 import OEditGoals from "./components/organisms/o-editGoals";
 import OEditSkills from "./components/organisms/o-editSkills";
 import TribeVerListing from "./components/molecules/m-tribeVerListing";
+import authentication from './authentication';
+import store from './store';
 
 Vue.use(Router);
 
@@ -24,7 +26,7 @@ const router = new Router({
     routes: [
         {
             path: '*',
-            redirect: '/debug'
+            redirect: '/dashboard'
         },
         {
             path: '/dashboard',
@@ -157,12 +159,12 @@ router.beforeEach((to, from, next) => {
     //   next();
     // }
 
-    if (to.matched.some(record => record.meta.requiresAuthentication)) {
-        if ($adal.isAuthenticated()) {
-            this.$store.commit('setCurrentUser', AuthenticationContext.user);
+    if (to.matched.some(record => record.meta.requireAuth)) {
+        if (authentication.isAuthenticated()) {
+            store.commit('setCurrentUser', authentication.getUser());
             next();
         } else {
-            AuthenticationContext.login();
+            authentication.signIn();
         }
     } else {
         next();
