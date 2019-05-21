@@ -93,6 +93,7 @@
 <style scoped lang="scss">
     @import "@/styles/main.scss";
 
+
     .m-navbar {
 
         &__listWrapper {

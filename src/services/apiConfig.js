@@ -4,7 +4,9 @@ import authentication from '../authentication';
 const config = {
     baseUrl: 'http://localhost:5000/api',
     userEndpoint: '/users',
-    roleEndpoint: '/roles'
+    roleLevelEndpoint: '/roles/levels',
+    roleTypeEndpoint: '/roles/types',
+
 
 };
 
@@ -28,6 +30,22 @@ export default {
 
             return axios
                 .post(endpoint, users, {headers: getHeader()});
+
+        }
+    },
+    Role: {
+        updateRange: function (items) {
+            let endpoint = config.baseUrl + config.roleLevelEndpoint + "/update";
+
+            return axios
+                .post(endpoint, items, {headers: getHeader()});
+
+        },
+        updateTypeRange: function (items) {
+            let endpoint = config.baseUrl + config.roleTypeEndpoint + "/update";
+
+            return axios
+                .post(endpoint, items, {headers: getHeader()});
 
         }
     }
