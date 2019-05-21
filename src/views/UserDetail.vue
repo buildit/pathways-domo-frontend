@@ -2,46 +2,28 @@
     <div class="container">
         <div class="m-userDetail__wrapper p-4">
             <div class="row">
-                <div id="m-userDetail__sidebar" class="col-12 col-lg-3"                >
+                <div class="col-12 col-lg-3" id="m-userDetail__sidebar">
                     <div class="m-userDetail__sidebarPanels">
                         <div class="m-userDetail__sidebarProfile  -cardSidebar p-4">
                             <h2 v-if="userProfile">
-                                {{ fullName }}
-                            </h2>
+                                {{ fullName }} </h2>
                             <p v-if="userProfile">
-                                Forecast ID: {{ userProfile.forecast_user_id }}
-                            </p>
-
+                                Forecast ID: {{ userProfile.domoIdentifier }} </p>
                             <o-user-role-breakdown></o-user-role-breakdown>
                         </div>
 
-                        <div
-                                v-if="$route.params.id==='skills'"
-                                class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4"
-                        >
+                        <div class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4" v-if="$route.params.id==='skills'">
                             <h2>Role Progress</h2>
-                            <m-user-role-completion
-                                    v-bind:listOfItems="nextRoleLevels"
-                                    v-bind:showEmpty="false"
-                            ></m-user-role-completion>
+                            <m-user-role-completion v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false"></m-user-role-completion>
                         </div>
 
-                        <div
-                                v-if="$route.params.id==='goals'"
-                                class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4"
-                        >
+                        <div class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4" v-if="$route.params.id==='goals'">
                             <h2>Goals Progress</h2>
 
-                            <m-user-role-completion
-                                    v-bind:listOfItems="userGoals"
-                                    v-bind:showEmpty="true"
-                            ></m-user-role-completion>
+                            <m-user-role-completion v-bind:listOfItems="userGoals" v-bind:showEmpty="true"></m-user-role-completion>
                         </div>
 
-                        <div
-                                v-if="$route.params.id==='tribeverification'"
-                                class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4"
-                        >
+                        <div class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4" v-if="$route.params.id==='tribeverification'">
                             <h2>Fake Meta</h2>
 
                             <h3> Wipro Band</h3>
@@ -59,24 +41,11 @@
                 </div>
 
                 <div class=" col-12 col-lg-9">
-                    <o-edit-skills
-                            v-if="$route.params.id==='skills'"
-                            v-bind:nextRoleLevels="nextRoleLevels"
-                            @setHelpPanelContent="setHelpPanelContent"
-                            @setLoadingState="setLoadingState"
-                    >
-                    </o-edit-skills>
+                    <o-edit-skills @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState" v-bind:nextRoleLevels="nextRoleLevels" v-if="$route.params.id==='skills'"></o-edit-skills>
 
-                    <o-edit-goals
-                            v-if="$route.params.id==='goals'"
-                            @setLoadingState="setLoadingState"
-                    >
-                    </o-edit-goals>
+                    <o-edit-goals @setLoadingState="setLoadingState" v-if="$route.params.id==='goals'"></o-edit-goals>
 
-                    <tribe-ver-listing
-                            v-if="$route.params.id==='tribeverification'"
-                            @setLoadingState="setLoadingState"
-                    ></tribe-ver-listing>
+                    <tribe-ver-listing @setLoadingState="setLoadingState" v-if="$route.params.id==='tribeverification'"></tribe-ver-listing>
                 </div>
             </div>
         </div>
@@ -117,7 +86,11 @@
                 'userGoals'
             ]),
             fullName: function () {
-                return this.currentUser.name;
+                if (this.currentUser != null && this.currentUser.profile != null) {
+                    return this.currentUser.profile.name;
+                }
+
+                return null;
             },
             nextRoleLevels: function () {
                 let nextRoleLevels = {};

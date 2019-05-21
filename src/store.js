@@ -139,7 +139,8 @@ const store = new Vuex.Store({
         fetchUserProfile({commit, state}) {
             state.currentUser.email;
             fb.usersCollection.doc(state.currentUser.email).get().then(res => {
-                commit('setUserProfile', res.data());
+                console.log('committing ' + res.data.username);
+                commit('setUserProfile', res.data);
             }).catch(err => {
                 console.log(err);
             });
@@ -303,41 +304,7 @@ const store = new Vuex.Store({
 
         }, // fetch all data
         requestAccessToken({commit, dispatch}) {
-            return new Promise((resolve, reject) => {
-                const cred = {
-                    clientID: 'f2031029-d9a3-4d29-9a40-b0467f4198f9',
-                    secret: '39efbc1697c030a456f9f3325e357cc20e50af90ff385d8ac68b3be40eb20370'
-                };
-                const config = {
-                    url: 'https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data',
-                    method: 'get',
-                    headers: {
-                        'Content-Type': 'application/jsonObject',
-                        'Authorization': 'Basic ' + btoa(cred.clientID + ':' + cred.secret)
-                    }
-                };
-
-                axios(config)
-                    .then(response => {
-
-                        if (response.status === 200) {
-                            localStorage.setItem('user-accessToken', 'Bearer ' + response.data.access_token);
-                            commit('setToken', 'Bearer ' + response.data.access_token);
-                            commit('setAccessTokenStatus', 200);
-
-                            resolve(response);
-                        }
-                    })
-                    .catch(e => {
-                        commit('setToken', '');
-                        commit('setAccessTokenStatus', e);
-
-                        localStorage.removeItem('user-accessToken');
-
-                        reject(e);
-
-                    });
-            });
+            // TODO: Backend Request
         },
         getDatasetList({commit, state, dispatch}, listOffset = 0) {
             return new Promise((resolve, reject) => {

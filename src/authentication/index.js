@@ -1,10 +1,8 @@
 import AuthenticationContext from 'adal-angular/lib/adal.js';
-import store from '../store';
 
 const config = {
     clientId: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8',
     tenant: '1a6dbb80-5290-4fd1-a938-0ad7795dfd7a',
-
     redirectUri: 'http://localhost:3110/',
     cacheLocation: 'localStorage'
 };
@@ -49,7 +47,9 @@ export default {
     acquireTokenRedirect() {
         this.authenticationContext.acquireTokenRedirect('<azure active directory resource id>');
     },
-
+    getCachedToken() {
+        return this.authenticationContext.getCachedToken(config.clientId);
+    },
     isAuthenticated() {
         // getCachedToken will only return a valid, non-expired token.
         if (this.authenticationContext.getCachedToken(config.clientId)) {
