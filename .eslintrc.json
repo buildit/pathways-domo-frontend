@@ -31,6 +31,7 @@
     "vue/prop-name-casing": 0,
     "semi": 1,
     "vue/attributes-order": 2,
-    "vue/max-attributes-per-line": 0
+    "vue/max-attributes-per-line": 0,
+    "vue/": 1
   }
 }
