@@ -2,13 +2,15 @@
     <div>
         <accordion :action="updateRoles" :details="roleMappings" title="role levels"></accordion>
         <accordion :action="updateRoleTypes" :details="roleTypeMappings" title="role types"></accordion>
-        <accordion :action="updateUsers" :details="userMappings" title="users"></accordion>
+        <!--<accordion :action="updateUsers" :details="userMappings" title="users"></accordion>-->
     </div>
 </template>
 <script>
     import {mapState} from "vuex";
     import accordion from '../components/atoms/a-Accordion';
     import api from '../services/apiConfig';
+
+    const fb = require('../services/firebaseDebug');
 
     export default {
         components: {accordion},
@@ -21,7 +23,12 @@
                 'skillGroups',
                 'skills',
                 'skillLevels',
-                'roles'
+                'roles',
+                'fbusers',
+                'fbroles',
+                'fbskillGroups',
+                'fbskillLevels',
+                'fbskills'
             ]),
 
         },
@@ -29,10 +36,10 @@
         methods: {
             roleTypeMappings: function () {
                 let result = [];
-                for (let u in this.skillGroups) {
+                for (let u in this.fbskillGroups) {
                     result.push({
-                        "name": this.skillGroups[u].name,
-                        "title": this.skillGroups[u].title
+                        "name": this.fbskillGroups[u].name,
+                        "title": this.fbskillGroups[u].title
                     });
                 }
 
@@ -40,11 +47,11 @@
             },
             roleMappings: function () {
                 let result = [];
-                for (let u in this.roles) {
+                for (let u in this.fbroles) {
                     result.push({
-                        "name": this.roles[u].name,
-                        "level": this.roles[u].level.toString(),
-                        "description": this.roles[u].description
+                        "name": this.fbroles[u].name,
+                        "level": this.fbroles[u].level.toString(),
+                        "description": this.fbroles[u].description
                     });
                 }
 
@@ -52,10 +59,10 @@
             },
             userMappings: function () {
                 let result = [];
-                for (let u in this.users) {
+                for (let u in this.fbusers) {
                     result.push({
-                        "username": this.users[u].user_email,
-                        "domoIdentifier": this.users[u].forecast_user_id.toString()
+                        "username": this.fbusers[u].user_email,
+                        "domoIdentifier": this.fbusers[u].forecast_user_id.toString()
                     });
                 }
                 return result;

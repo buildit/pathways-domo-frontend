@@ -6,7 +6,7 @@
                     <div class="m-userDetail__sidebarPanels">
                         <div class="m-userDetail__sidebarProfile  -cardSidebar p-4">
                             <h2 v-if="userProfile">
-                                {{ fullName }}
+                                {{ userProfile.name }}
                             </h2>
                             <p v-if="userProfile">
                                 Forecast ID: {{ userProfile.domoIdentifier }}
@@ -87,13 +87,6 @@
             ...mapGetters([
                 'userGoals'
             ]),
-            fullName: function () {
-                if (this.currentUser != null && this.currentUser.profile != null) {
-                    return this.currentUser.profile.name;
-                }
-
-                return null;
-            },
             nextRoleLevels: function () {
                 let nextRoleLevels = {};
 

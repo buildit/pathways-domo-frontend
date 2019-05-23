@@ -3,6 +3,9 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import api from './services/apiConfig';
 
+// https://blog.sqreen.com/authentication-best-practices-vue/
+const fb = require('./services/firebaseConfig.js');
+
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -19,13 +22,7 @@ const store = new Vuex.Store({
         datasetList: [],
         apiData: [],
         apiCallStatus: 200,
-        domoTokenAttempts: 0,
-        // Temp for debug
-        fbroles: [],
-        fbusers: [],
-        fbskillGroups: [],
-        fbskillLevels: [],
-        fbskills: [],
+        domoTokenAttempts: 0
     },
     getters: {
         qualifiedUsersBySkillGroup: state => {
@@ -141,34 +138,28 @@ const store = new Vuex.Store({
             commit('setSkillGroups', null);
         },
         fetchUserProfile({commit, state}) {
-            api.User.get(state.currentUser.email).then(res => {
-
+            state.currentUser.email;
+            fb.usersCollection.doc(state.currentUser.email).get().then(res => {
                 console.log('committing ' + res.data.username);
-                if (res.data.directoryName == null) {
-                    res.data.directoryName = state.currentUser.name;
-                    res.data.name = state.currentUser.name.replace('(Digital)', '');
-                    store.dispatch('updateProfile', res.data);
-                }
-
                 commit('setUserProfile', res.data);
-
-                if (res.data != null) {
-                    store.dispatch('fetchAllData', res);
-                }
             }).catch(err => {
                 console.log(err);
             });
-            return null;
         },
         updateProfile({commit, state}, data) {
-            api.User.update(data).then(user => {
-                console.log('User profile updated.');
+            let user_first_name = data.user_first_name;
+            let user_last_name = data.user_last_name;
+
+            fb.usersCollection.doc(state.currentUser.uid).update({user_first_name, user_last_name}).then(user => {
+
             }).catch(err => {
                 console.log(err);
             });
         },
         updateUserRoleLevels({commit, state}) {
             let newRoleLevels = {};
+
+
             for (let sg_id in state.skillGroups) {
                 const currentGroup = state.skillGroups[sg_id];
 
@@ -227,6 +218,7 @@ const store = new Vuex.Store({
                     } // if hit the criteria
                 } // for roles
             }
+
             fb.usersCollection.doc(state.currentUser.uid).set({
                 roles: newRoleLevels
             }, {
@@ -238,17 +230,77 @@ const store = new Vuex.Store({
             });
         },
         fetchAllData({commit, state}, user) {
-            api.User.getAll().then(res => {
-                let tempArray = [];
-                res.data.forEach(doc => {
-                    let user = doc.data;
+            store.commit('setCurrentUser', user);
+
+            fb.usersCollection.doc(user.uid).onSnapshot(doc => {
+                store.commit('setUserProfile', doc.data());
+
+
+            }); // user
+
+            fb.usersCollection.onSnapshot(querySnapshot => {
+                let tempArray = {};
+
+                querySnapshot.forEach(doc => {
+                    let user = doc.data();
                     tempArray[doc.id] = user;
                 });
 
                 store.commit('setUsers', tempArray);
+            }); // skill groups
+
+            fb.skillGroupsCollection.onSnapshot(querySnapshot => {
+                let tempArray = {};
+
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    tempArray[doc.id] = group;
+                });
+
+                store.commit('setSkillGroups', tempArray);
+
+
+            }); // skill groups
+
+            fb.skillsCollection.onSnapshot(querySnapshot => {
+                let tempArray = {};
+
+                querySnapshot.forEach(doc => {
+                    let post = doc.data();
+                    tempArray[doc.id] = post;
+                });
+
+                store.commit('setSkills', tempArray);
+
+
+            }); // skills
+
+            fb.skillLevelsCollection.orderBy('level', 'asc').onSnapshot(querySnapshot => {
+                let tempArray = [];
+
+                querySnapshot.forEach(doc => {
+                    let post = doc.data();
+                    post.sl_id = doc.id;
+
+                    tempArray.push(post);
+                });
+
+                store.commit('setSkillLevels', tempArray);
             });
 
-            api.Role.getAllTypes();
+            fb.rolesCollection.orderBy('level', 'asc').onSnapshot(querySnapshot => {
+                let tempArray = [];
+
+                querySnapshot.forEach(doc => {
+                    let post = doc.data();
+                    post.r_id = doc.id;
+
+                    tempArray.push(post);
+
+                });
+
+                store.commit('setRoles', tempArray);
+            }); // roles
 
 
         }, // fetch all data
@@ -450,49 +502,7 @@ const store = new Vuex.Store({
                 state.apiCallStatus = '';
             }
         },
-        // Temp for debug
-        setfbUsers(state, val) {
-            if (val) {
-                state.fbusers = val;
-            } else {
-                state.fbusers = '';
-            }
-        },
-        setfbRoles(state, val) {
-            if (val) {
-                state.fbroles = val;
-            } else {
-                state.fbroles = '';
-            }
-        },
-        setfbusers(state, val) {
-            if (val) {
-                state.fbusers = val;
-            } else {
-                state.fbusers = '';
-            }
-        },
-        setfbSkillGroups(state, val) {
-            if (val) {
-                state.fbskillGroups = val;
-            } else {
-                state.fbskillGroups = '';
-            }
-        },
-        setfbSkillLevels(state, val) {
-            if (val) {
-                state.fbskillLevels = val;
-            } else {
-                state.fbskillLevels = '';
-            }
-        },
-        setfbSkills(state, val) {
-            if (val) {
-                state.fbskills = val;
-            } else {
-                state.fbskills = '';
-            }
-        },
+
     }
 });
 

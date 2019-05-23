@@ -3,15 +3,14 @@ import store from '../store';
 import api from './apiConfig';
 
 
+let dbCollection = function dbCollection(collectionType) {
+    this.collectionType = collectionType;
+};
 const db = {
     collection: function (dataType) {
         console.log("requested " + dataType);
         return new dbCollection(dataType);
     }
-};
-
-var dbCollection = function dbCollection(collectionType) {
-    this.collectionType = collectionType;
 };
 
 let backendQuery = function backendQuery(query, apiCall) {
@@ -27,7 +26,6 @@ dbCollection.prototype.doc = function docRef(value) {
         return new backendQuery(value);
     }
 };
-
 
 backendQuery.prototype.get = function () {
     console.log("getting this " + this.query);
@@ -54,9 +52,11 @@ const skillLevelsCollection = db.collection('skill_levels');
 const skillsCollection = db.collection('skills');
 
 const auth = authentication.authenticationContext;
+
 const currentUser = function () {
     return store.state.currentUser;
 };
+
 authentication.initialize().then((u) => {
     store.commit('setCurrentUser', authentication.getUserProfile());
     store.dispatch('fetchUserProfile');
