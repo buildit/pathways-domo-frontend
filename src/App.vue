@@ -74,7 +74,6 @@
 <style scoped lang="scss">
     @import "@/styles/main.scss";
 
-
     .o-mainWrapper {
         padding-top: space(7);
         transition: max-width $animation-medium;

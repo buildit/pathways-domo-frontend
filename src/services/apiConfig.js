@@ -6,8 +6,6 @@ const config = {
     userEndpoint: '/users',
     roleLevelEndpoint: '/roles/levels',
     roleTypeEndpoint: '/roles/types',
-
-
 };
 
 let getHeader = function () {
@@ -34,6 +32,14 @@ export default {
         }
     },
     Role: {
+        getAll: function(){
+            let endpoint = config.baseUrl + config.roleLevelEndpoint;
+            return axios.get(endpoint, {headers: getHeader()});
+        },
+        getAllTypes: function(){
+            let endpoint = config.baseUrl + config.roleTypeEndpoint
+            return axios.get(endpoint, {headers: getHeader()});
+        },
         updateRange: function (items) {
             let endpoint = config.baseUrl + config.roleLevelEndpoint + "/update";
 

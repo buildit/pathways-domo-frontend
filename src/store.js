@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+import api from './services/apiConfig';
 
 // https://blog.sqreen.com/authentication-best-practices-vue/
 const fb = require('./services/firebaseConfig.js');

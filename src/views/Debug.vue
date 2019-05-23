@@ -1,21 +1,14 @@
 <template>
     <div>
         <accordion :action="updateRoles" :details="roleMappings" title="role levels"></accordion>
-
         <accordion :action="updateRoleTypes" :details="roleTypeMappings" title="role types"></accordion>
-
-
-        <accordion :action="updateUsers" :details="userMappings" title="users">
-
-        </accordion>
+        <accordion :action="updateUsers" :details="userMappings" title="users"></accordion>
     </div>
 </template>
 <script>
     import {mapState} from "vuex";
     import accordion from '../components/atoms/a-Accordion';
     import api from '../services/apiConfig';
-
-    const fb = require('../services/firebaseDebug');
 
     export default {
         components: {accordion},

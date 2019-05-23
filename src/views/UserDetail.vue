@@ -97,8 +97,6 @@
             nextRoleLevels: function () {
                 let nextRoleLevels = {};
 
-
-                // console.log(this.roleLevels)
                 for (let sg_id in this.skillGroups) {
                     if (this.userProfile.roles[sg_id]) {
                         if (this.userProfile.roles == null) {
@@ -158,7 +156,6 @@
 
 <style scoped lang="scss">
     @import "@/styles/main.scss";
-
 
     .m-userDetail {
         &__wrapper {
