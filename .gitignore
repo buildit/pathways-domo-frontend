@@ -23,3 +23,5 @@ yarn-error.log*
 *.pub
 
 firebaseConfig.json
+codealike.json
+latest/

@@ -2,7 +2,10 @@
     <div>
         <accordion :action="updateRoles" :details="roleMappings" title="role levels"></accordion>
         <accordion :action="updateRoleTypes" :details="roleTypeMappings" title="role types"></accordion>
-        <!--<accordion :action="updateUsers" :details="userMappings" title="users"></accordion>-->
+        <accordion :action="updateUsers" :details="userMappings" title="users"></accordion>
+        <accordion :action="updateSkills" :details="skillMappings" title="skills"></accordion>
+        <accordion :action="updateSkillLevels" :details="skillLevelMappings" title="skill levels"></accordion>
+        <accordion :action="updateSkillLevelTypes" :details="skillTypeLevelMappings" title="skill Type levels"></accordion>
     </div>
 </template>
 <script>
@@ -66,6 +69,57 @@
                     });
                 }
                 return result;
+            },
+            skillMappings: function () {
+                let result = [];
+                for (let u in this.fbskills) {
+                    result.push({
+                        "name": this.fbskills[u].name,
+                        "description": this.fbskills[u].description
+                    });
+                }
+                return result;
+            },
+            skillLevelMappings: function () {
+                let result = [];
+                for (let u in this.fbskillLevels) {
+                    result.push({
+                        "skillTypeId": null,
+                        "name": this.fbskillLevels[u].name,
+                        "description": this.fbskillLevels[u].description,
+                        "level": this.fbskillLevels[u].level.toString(),
+                    });
+                }
+
+                return result;
+            },
+            skillTypeLevelMappings: function () {
+                let result = [];
+
+                for (let u in this.fbskills) {
+                    let tempSkill = this.fbskills[u];
+                    let dbSkill = this.skills.find(p => p.name === tempSkill.name);
+
+                    for (let i in tempSkill.levels) {
+                        let dbLevel = this.skillLevels.find(s => s.name === tempSkill.levels[i].sl_name);
+
+                        result.push({
+                            "skillTypeId": dbSkill.id,
+                            "description": tempSkill.levels[i].description,
+                            "skillLevelId": dbLevel.id,
+                        });
+                    }
+                }
+                return result;
+            },
+            updateSkillLevelTypes: function (results) {
+                api.Skill.updateTypeLevelRange(results).then(r => console.log(r));
+            },
+            updateSkillLevels: function (results) {
+                api.Skill.updateLevelRange(results).then(r => console.log(r));
+            },
+            updateSkills: function (results) {
+                api.Skill.updateRange(results).then(r => console.log(r));
             },
             updateUsers: function (results) {
                 api.User.updateRange(results).then(r => console.log(r));

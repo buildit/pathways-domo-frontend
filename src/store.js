@@ -239,17 +239,24 @@ const store = new Vuex.Store({
         },
         fetchAllData({commit, state}, user) {
             api.User.getAll().then(res => {
-                let tempArray = [];
-                res.data.forEach(doc => {
-                    let user = doc.data;
-                    tempArray[doc.id] = user;
-                });
-
-                store.commit('setUsers', tempArray);
+                store.commit('setUsers', res.data);
             });
 
-            api.Role.getAllTypes();
+            api.Role.getAll().then(res => {
+                store.commit('setRoles', res.data);
+            });
 
+            api.Role.getAllTypes().then(res => {
+                store.commit('setSkillGroups', res.data);
+            });
+
+            api.Skill.getAll().then(res => {
+                store.commit('setSkills', res.data);
+            });
+
+            api.Skill.getAllLevels().then(res => {
+                store.commit('setSkillLevels', res.data);
+            });
 
         }, // fetch all data
         requestAccessToken({commit, dispatch}) {

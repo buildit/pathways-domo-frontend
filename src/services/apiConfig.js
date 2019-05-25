@@ -6,6 +6,9 @@ const config = {
     userEndpoint: '/users',
     roleLevelEndpoint: '/roles/levels',
     roleTypeEndpoint: '/roles/types',
+    skillLevelEndpoint: '/skill/levels',
+    skillTypeEndpoint: '/skill/types',
+    skillTypeLevelEndpoint: '/skill/typelevel'
 };
 
 let getHeader = function () {
@@ -35,6 +38,35 @@ export default {
             let endpoint = `${config.baseUrl + config.userEndpoint}/update`;
             return axios
                 .post(endpoint, users, {headers: getHeader()});
+        },
+    },
+    Skill: {
+        getAll: function () {
+            let endpoint = config.baseUrl + config.skillTypeEndpoint;
+            return axios.get(endpoint, {headers: getHeader()});
+        },
+        getAllLevels: function () {
+            let endpoint = config.baseUrl + config.skillLevelEndpoint;
+            return axios.get(endpoint, {headers: getHeader()});
+        },
+        getAllLevelTypes: function () {
+            let endpoint = config.baseUrl + config.skillTypeLevelEndpoint;
+            return axios.get(endpoint, {headers: getHeader()});
+        },
+        updateRange: function (items) {
+            let endpoint = `${config.baseUrl + config.skillTypeEndpoint}/update`;
+            return axios
+                .post(endpoint, items, {headers: getHeader()});
+        },
+        updateLevelRange: function (items) {
+            let endpoint = `${config.baseUrl + config.skillLevelEndpoint}/update`;
+            return axios
+                .post(endpoint, items, {headers: getHeader()});
+        },
+        updateTypeLevelRange: function (items) {
+            let endpoint = `${config.baseUrl + config.skillTypeLevelEndpoint}/update`;
+            return axios
+                .post(endpoint, items, {headers: getHeader()});
         },
     },
     Role: {
