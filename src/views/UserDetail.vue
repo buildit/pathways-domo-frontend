@@ -90,36 +90,36 @@
             nextRoleLevels: function () {
                 let nextRoleLevels = {};
 
-                for (let sg_id in this.skillGroups) {
-                    if (this.userProfile.roles[sg_id]) {
-                        if (this.userProfile.roles == null) {
-                            console.error(`Catastrophy! Could not fetch roles for user {this.userProfile.username}`);
-                            break;
-                        }
-                        const thisLevel = this.userProfile.roles[sg_id];
+                for (let i = 0; i < this.skillGroups.length; i++) {
+                    let sg = this.skillGroups[i];
 
-                        if (thisLevel.level < this.roles.length - 1) {
-                            const nextLevel = parseInt(thisLevel.level) + 1;
+                    if (this.userProfile.roles == null) {
+                        console.error(`Catastrophy! Could not fetch roles for user {this.userProfile.username}`);
+                        break;
+                    }
+                    const thisLevel = this.userProfile.roles[sg_id];
 
-                            const r_id = this.roles[nextLevel]['r_id'];
+                    if (thisLevel.level < this.roles.length - 1) {
+                        const nextLevel = parseInt(thisLevel.level) + 1;
 
-                            const totalFromNextLevel = this.userProfile.roles[sg_id]['targetTracking'][r_id]['total'];
-                            const userCurrentLevelTotal = this.userProfile.roles[sg_id]['targetTracking'][r_id]['userPoints'];
-                            const progressAway = (userCurrentLevelTotal > 0) ? userCurrentLevelTotal / totalFromNextLevel : 0;
+                        const r_id = this.roles[nextLevel]['r_id'];
 
-                            nextRoleLevels[sg_id] = {};
+                        const totalFromNextLevel = this.userProfile.roles[sg_id]['targetTracking'][r_id]['total'];
+                        const userCurrentLevelTotal = this.userProfile.roles[sg_id]['targetTracking'][r_id]['userPoints'];
+                        const progressAway = (userCurrentLevelTotal > 0) ? userCurrentLevelTotal / totalFromNextLevel : 0;
 
-                            nextRoleLevels[sg_id]['role_name'] = this.roles[nextLevel]['name'];
-                            nextRoleLevels[sg_id]['progressCompleted'] = progressAway;
-                            nextRoleLevels[sg_id]['group_name'] = this.skillGroups[sg_id]['name'];
-                            nextRoleLevels[sg_id]['title'] = this.skillGroups[sg_id]['title'];
+                        nextRoleLevels[sg_id] = {};
 
-                            // loop thru roles
-                            // compare each with
-                        } else {
-                            nextRoleLevels[sg_id] = false;
-                        } // check if user is already maxed out
-                    } // if group exists in roleLevels. it should though...
+                        nextRoleLevels[sg_id]['role_name'] = this.roles[nextLevel]['name'];
+                        nextRoleLevels[sg_id]['progressCompleted'] = progressAway;
+                        nextRoleLevels[sg_id]['group_name'] = this.skillGroups[sg_id]['name'];
+                        nextRoleLevels[sg_id]['title'] = this.skillGroups[sg_id]['title'];
+
+                        // loop thru roles
+                        // compare each with
+                    } else {
+                        nextRoleLevels[sg_id] = false;
+                    } // check if user is already maxed out
                 } // for skill groups
 
 

@@ -6,6 +6,8 @@
         <accordion :action="updateSkills" :details="skillMappings" title="skills"></accordion>
         <accordion :action="updateSkillLevels" :details="skillLevelMappings" title="skill levels"></accordion>
         <accordion :action="updateSkillLevelTypes" :details="skillTypeLevelMappings" title="skill Type levels"></accordion>
+        <accordion :action="updateRoleLevelRules" :details="roleLevelRuleMappings" title="Role level rules"></accordion>
+        <accordion :action="updateUserSkills" :details="userSkillMappings" title="User Skills"></accordion>
     </div>
 </template>
 <script>
@@ -112,6 +114,54 @@
                 }
                 return result;
             },
+            roleLevelRuleMappings: function () {
+                let result = [];
+                for (let u in this.fbskillGroups) {
+                    let roleTypeId = this.skillGroups.find(sg => sg.name === this.fbskillGroups[u].name).id;
+                    for (let r in this.fbskillGroups[u].roles) {
+                        let roleLevelId = this.roles.find(rl => rl.name === this.fbskillGroups[u].roles[r].role_name).id;
+                        for (let s in this.fbskillGroups[u].roles[r].skills) {
+                            let skillLevelId = this.skillLevels.find(sl => sl.level === this.fbskillGroups[u].roles[r].skills[s].level).id;
+                            let skillTypeId = this.skills.find(st => st.name === this.fbskillGroups[u].roles[r].skills[s].skill_name).id;
+                            if (result.find(r => r.roleTypeId === roleTypeId && r.roleLevelId === roleLevelId && r.skillLevelId === skillLevelId && r.skillTypeId === skillTypeId) == null) {
+                                result.push({
+                                    "roleTypeId": roleTypeId,
+                                    "roleLevelId": roleLevelId,
+                                    "skillLevelId": skillLevelId,
+                                    "skillTypeId": skillTypeId
+                                });
+                            }
+                        }
+                    }
+                }
+
+                return result;
+            },
+            userSkillMappings: function () {
+                let result = [];
+                for (let u in this.fbusers) {
+                    let user = this.users.find(user => user.username === this.fbusers[u].user_email);
+                    if (!user) {
+                        console.log('no user in database with username ' + this.fbusers[u].user_email);
+                        continue;
+                    }
+
+                    let userId = user.id;
+                    for (let s in this.fbusers[u].skills) {
+                        let skillTypeId = this.skills.find(st => st.name === this.fbusers[u].skills[s].skill_name).id;
+                        let skillLevelId = this.skillLevels.find(st => st.level === this.fbusers[u].skills[s].level).id;
+                        if (result.find(r => r.userId === userId && r.skillLevelId === skillLevelId && r.skillTypeId === skillTypeId) == null) {
+                            result.push({
+                                "userId": userId,
+                                "skillLevelId": skillLevelId,
+                                "skillTypeId": skillTypeId
+                            });
+                        }
+                    }
+                }
+
+                return result;
+            },
             updateSkillLevelTypes: function (results) {
                 api.Skill.updateTypeLevelRange(results).then(r => console.log(r));
             },
@@ -129,6 +179,12 @@
             },
             updateRoleTypes: function (results) {
                 api.Role.updateTypeRange(results).then(r => console.log(r));
+            },
+            updateRoleLevelRules: function (results) {
+                api.RoleLevelRule.updateRange(results).then(r => console.log(r));
+            },
+            updateUserSkills: function (results) {
+                api.UserSkill.updateRange(results).then(r => console.log(r));
             }
         },
 
