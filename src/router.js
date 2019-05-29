@@ -2,14 +2,12 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import UserDetail from "./views/UserDetail";
 
-import Login from "./views/Login";
 import Settings from "./views/Settings";
 import DBLinkage from "./dbSetup_reference/DBLinkage";
 import CSVParse from "./dbSetup_reference/CSVParse";
 import EditGroups from "./views/EditGroups";
 import Home from "./views/Home";
 import SkillsBreakdown from "./views/SkillsBreakdown";
-import Debug from "./views/Debug";
 import Bench from "./views/Bench";
 import Tools from "./views/Tools";
 import Assessments from './views/Assessments';
@@ -60,7 +58,7 @@ const router = new Router({
                 requireAuth: true
             }
         },
-        {
+        /*{
             path: '/debug',
             name: 'Debug',
             component: Debug,
@@ -72,7 +70,7 @@ const router = new Router({
             path: '/login',
             name: 'Login',
             component: Login
-        },
+        },*/
         {
             path: '/settings',
             name: 'Settings',

@@ -1,34 +1,34 @@
 <template>
-  <div v-bind:class="{ 'd-flex' : isNavOpen}">
-    <loading-popover v-if="isLoading"></loading-popover>
-    <div class="o-mainWrapper__nav" v-bind:class="{ 'col-md-3' : isNavOpen, 'col-xl-2' : isNavOpen, 'panelLook': isNavOpen }">
-      <div v-if="isNavOpen" class="d-flex flex-row-reverse">
-        <button class="-closeButton" @click="setNavPanelState(false)">
-          X
-        </button>
-      </div>
-      <m-navbar v-if="currentUser" v-bind:isNavOpen="isNavOpen" @setNavPanelState="setNavPanelState"></m-navbar>
-    </div>
-    <div v-bind:class="{ 'col-md-9' : isNavOpen, 'col-xl-10' : isNavOpen}">
-      <div class="d-flex">
-        <div class="o-mainWrapper col-12" v-bind:class="{'col-xl-8': isHelperPanelOpen}">
-          <router-view @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState"></router-view>
-        </div>
-        <transition name="width-change">
-          <div v-if="isHelperPanelOpen" class="o-helpPanel__wrapper p-0">
-            <div class="o-helpPanel__content px-4 pt-3">
-              <div class="d-flex flex-row-reverse">
-                <button class="-closeButton" @click="setHelpPanelState(false)">
-                  X
+    <div v-bind:class="{ 'd-flex' : isNavOpen}">
+        <loading-popover v-if="isLoading"></loading-popover>
+        <div class="o-mainWrapper__nav" v-bind:class="{ 'col-md-3' : isNavOpen, 'col-xl-2' : isNavOpen, 'panelLook': isNavOpen }">
+            <div class="d-flex flex-row-reverse" v-if="isNavOpen">
+                <button @click="setNavPanelState(false)" class="-closeButton">
+                    X
                 </button>
-              </div>
-              <o-help-panel__content class="p-4" v-bind:helpPanel_object="helpPanel_object" @setHelpPanelState="setHelpPanelState"></o-help-panel__content>
             </div>
-          </div>
-        </transition>
-      </div>
+            <m-navbar @setNavPanelState="setNavPanelState" v-bind:isNavOpen="isNavOpen" v-if="currentUser"></m-navbar>
+        </div>
+        <div v-bind:class="{ 'col-md-9' : isNavOpen, 'col-xl-10' : isNavOpen}">
+            <div class="d-flex">
+                <div class="o-mainWrapper col-12" v-bind:class="{'col-xl-8': isHelperPanelOpen}">
+                    <router-view @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState"></router-view>
+                </div>
+                <transition name="width-change">
+                    <div class="o-helpPanel__wrapper p-0" v-if="isHelperPanelOpen">
+                        <div class="o-helpPanel__content px-4 pt-3">
+                            <div class="d-flex flex-row-reverse">
+                                <button @click="setHelpPanelState(false)" class="-closeButton">
+                                    X
+                                </button>
+                            </div>
+                            <o-help-panel__content @setHelpPanelState="setHelpPanelState" class="p-4" v-bind:helpPanel_object="helpPanel_object"></o-help-panel__content>
+                        </div>
+                    </div>
+                </transition>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 <script>
     import {mapState} from 'vuex';
@@ -75,7 +75,7 @@
     @import "@/styles/main.scss";
 
     .o-mainWrapper {
-        padding-top: space(7);
+        padding-top: space(1);
         transition: max-width $animation-medium;
 
         &.col-12 {

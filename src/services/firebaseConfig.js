@@ -2,7 +2,6 @@ import authentication from '../authentication';
 import store from '../store';
 import api from './apiConfig';
 
-
 let dbCollection = function dbCollection(collectionType) {
     this.collectionType = collectionType;
 };
