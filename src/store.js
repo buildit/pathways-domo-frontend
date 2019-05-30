@@ -9,8 +9,9 @@ const store = new Vuex.Store({
     state: {
         currentUser: null,
         userProfile: {},
-        userRoles: {},
+        userRoles: null,
         skillGroups: {},
+        skillGroupSkills: {},
         skills: {},
         skillLevels: [],
         roles: [],
@@ -167,28 +168,51 @@ const store = new Vuex.Store({
         setUserRoles({commit, state}, data) {
             let skillset = state.userProfile.userSkills;
             let rules = state.roleLevelRules;
-            let userRoles = [];
-            let rulesMap = [];
+            let userRoles = {};
+            let rulesMap = {};
+
+            let skillGroupSkillSet = {};
 
             // break down rule set into roles
-            rules.forEach(function (r) {
+            data.forEach(function (r) {
                 if (rulesMap[r.roleTypeId] == null) {
-                    rulesMap[r.roleTypeId] = [];
+                    rulesMap[r.roleTypeId] = {
+                        rLevels: {},
+                    };
                 }
-                rulesMap[r.roleTypeId].push(r);
+
+                if (rulesMap[r.roleTypeId].rLevels[r.roleLevelId] == null) {
+                    rulesMap[r.roleTypeId].rLevels[r.roleLevelId] = [];
+                }
+
+                if (skillGroupSkillSet[r.roleTypeId] == null) {
+                    skillGroupSkillSet[r.roleTypeId] = {skills: new Set()};
+                }
+
+                skillGroupSkillSet[r.roleTypeId].skills.add(state.skills.find(s => s.id === r.skillTypeId));
+
+                rulesMap[r.roleTypeId].rLevels[r.roleLevelId].push({type: r.skillTypeId, level: r.skillLevelId});
+
             });
 
-            console.log(rulesMap);
-            // find out which roles user is eligible for
-            rulesMap.forEach(function (rm) {
-                if (!skillset.arrayIncludes) {
+            console.log(skillGroupSkillSet);
 
+            this.state.skillGroups.forEach(sg => {
+                userRoles[sg.id] = this.state.roles.find(r => r.level === 0);
+            });
+
+            // find out which roles user is eligible for
+            /*rulesMap.forEach(function (rm) {
+                let mappedRoles = [];
+                if (!skillset.includes(s => s.skillTypeId === rm.skillTypeId)) {
+                    mappedRoles.push();
                 } else {
 
                 }
-            });
-
-            commit('setUserRoles', userRoles);
+                userRoles[rm.roleTypeId] = mappedRoles;
+            });*/
+            store.commit('setSkillGroupSkills', skillGroupSkillSet);
+            store.commit('setUserRoles', userRoles);
         },
         updateProfile({commit, state}, data) {
             api.User.update(data).then(user => {
@@ -268,30 +292,35 @@ const store = new Vuex.Store({
             });
         },
         fetchAllData({commit, state}, user) {
-            api.User.getAll().then(res => {
+            const usersRequest = api.User.getAll().then(res => {
                 store.commit('setUsers', res.data);
             });
 
-            api.Role.getAll().then(res => {
+            const rolesRequest = api.Role.getAll().then(res => {
                 store.commit('setRoles', res.data);
             });
 
-            api.Role.getAllTypes().then(res => {
+            const skillGroupRequest = api.Role.getAllTypes().then(res => {
                 store.commit('setSkillGroups', res.data);
             });
 
-            api.Skill.getAll().then(res => {
+            const skillsRequest = api.Skill.getAll().then(res => {
                 store.commit('setSkills', res.data);
             });
 
-            api.Skill.getAllLevels().then(res => {
+            const skillLevelsRequest = api.Skill.getAllLevels().then(res => {
                 store.commit('setSkillLevels', res.data);
             });
 
-            api.RoleLevelRule.getAll().then(res => {
+            const rulesRequest = api.RoleLevelRule.getAll().then(res => {
                 store.commit('setRoleLevelRules', res.data);
                 store.dispatch('setUserRoles', res.data);
             });
+
+            Promise.all([usersRequest, rolesRequest, skillGroupRequest, skillsRequest, skillLevelsRequest])
+                .then(() => {
+                    return rulesRequest;
+                });
         }, // fetch all data
         requestAccessToken({commit, dispatch}) {
             // TODO: Backend Request
@@ -400,7 +429,6 @@ const store = new Vuex.Store({
         }
     },
     mutations: {
-
         setCurrentUser(state, val) {
             state.currentUser = val;
         },
@@ -505,47 +533,11 @@ const store = new Vuex.Store({
                 state.roleLevelRules = [];
             }
         },
-        // Temp for debug
-        setfbUsers(state, val) {
+        setSkillGroupSkills(state, val) {
             if (val) {
-                state.fbusers = val;
+                state.skillGroupSkills = val;
             } else {
-                state.fbusers = '';
-            }
-        },
-        setfbRoles(state, val) {
-            if (val) {
-                state.fbroles = val;
-            } else {
-                state.fbroles = '';
-            }
-        },
-        setfbusers(state, val) {
-            if (val) {
-                state.fbusers = val;
-            } else {
-                state.fbusers = '';
-            }
-        },
-        setfbSkillGroups(state, val) {
-            if (val) {
-                state.fbskillGroups = val;
-            } else {
-                state.fbskillGroups = '';
-            }
-        },
-        setfbSkillLevels(state, val) {
-            if (val) {
-                state.fbskillLevels = val;
-            } else {
-                state.fbskillLevels = '';
-            }
-        },
-        setfbSkills(state, val) {
-            if (val) {
-                state.fbskills = val;
-            } else {
-                state.fbskills = '';
+                state.skillGroupSkills = [];
             }
         },
     }

@@ -4,20 +4,20 @@
             <div :id.prop="'sg_'+group.name" class="m-userDetail__skillGroup mb-6 p-4">
                 <div class="d-flex justify-content-between">
                     <h2>{{ group.name }}</h2>
-                    <a-help-button @setHelpPanelContent="setHelpPanelContent" v-bind:id="group_key.toString()" v-bind:type="'group'"></a-help-button>
+                    <a-help-button @setHelpPanelContent="setHelpPanelContent" v-bind:id="group.id.toString()" v-bind:type="'group'"></a-help-button>
                 </div>
                 <ul class="m-userDetail__roleStrip my-0 mb-4 p-0">
-                    <li v-if="userRoles[group_key]">
-                        <b>Current Level:</b> {{ userRoles[group_key].level_name }}
+                    <li v-if="userRoles[group.id]">
+                        <b>Current Level:</b> {{ userRoles[group.id].level_name }}
                     </li>
-                    <li v-if="nextRoleLevels[group_key]">
-                        <b>Up Next:</b> {{ nextRoleLevels[group_key]['role_name'] }} ({{
-                        Math.round(nextRoleLevels[group_key]['progressCompleted'] * 100) }}% Completed)
+                    <li v-if="nextRoleLevels[group.id]">
+                        <b>Up Next:</b> {{ nextRoleLevels[group.id]['role_name'] }} ({{
+                        Math.round(nextRoleLevels[group.id]['progressCompleted'] * 100) }}% Completed)
                     </li>
                 </ul>
 
                 <ul class="m-userDetail__skillList m-0 p-0 d-flex flex-wrap">
-                    <template v-for="skill in group.skills">
+                    <template v-for="skill in skillGroupSkills[group.id].skills">
                         <li class="col-6  d-flex px-2 mb-2">
                             <div :class="{'-isRequired': skill.required}" class="m-userDetail__skillListContent p-4 m-1 flex-grow-1 ">
                                 <div class="d-flex justify-content-between flex-grow-0">
@@ -26,9 +26,7 @@
 
                                     <a-help-button @setHelpPanelContent="setHelpPanelContent" v-bind:id="skill.s_id" v-bind:type="'skill'"></a-help-button>
                                 </div>
-
-
-                                <o-skill-level__panel v-bind:group="group" v-bind:group_key="group_key" v-bind:skill="skill" v-bind:skill_key="skill.s_id"></o-skill-level__panel>
+                                <o-skill-level__panel v-bind:group="group" v-bind:group_key="group.id.toString()" v-bind:skill="skill" v-bind:skill_key="skill.s_id"></o-skill-level__panel>
                             </div>
                         </li>
                     </template>
@@ -72,7 +70,8 @@
                 'skills',
                 'skillLevels',
                 'roles',
-                'userRoles'
+                'userRoles',
+                'skillGroupSkills'
             ])
         },
 

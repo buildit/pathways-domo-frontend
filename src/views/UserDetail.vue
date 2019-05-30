@@ -16,7 +16,7 @@
 
             <div v-if="$route.params.id==='skills'" class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4">
               <h2>Role Progress</h2>
-              <m-user-role-completion v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false"></m-user-role-completion>
+                <m-user-role-completion v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false" v-if="userRoles"></m-user-role-completion>
             </div>
 
             <div v-if="$route.params.id==='goals'" class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4">
@@ -28,7 +28,7 @@
             <div v-if="$route.params.id==='tribeverification'" class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4">
               <h2>Fake Meta</h2>
 
-              <h3> Wipro Band</h3>
+                <h3>Wipro Band</h3>
 
               <p>XX</p>
 
@@ -43,7 +43,7 @@
         </div>
 
         <div class=" col-12 col-lg-9">
-          <o-edit-skills v-if="$route.params.id==='skills'" v-bind:nextRoleLevels="nextRoleLevels" @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState"></o-edit-skills>
+            <o-edit-skills @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState" v-bind:nextRoleLevels="nextRoleLevels" v-if="$route.params.id==='skills' && userRoles"></o-edit-skills>
 
           <o-edit-goals v-if="$route.params.id==='goals'" @setLoadingState="setLoadingState"></o-edit-goals>
 
@@ -84,12 +84,14 @@
                 'skillLevels',
                 'roles',
                 'roleLevelRules',
-                'userRoles'
+                'userRoles',
+                'skillGroupSkills'
             ]),
             ...mapGetters([
                 'userGoals'
             ]),
             nextRoleLevels: function () {
+                console.log(this.skillGroupSkills);
                 let nextRoleLevels = {};
                 for (let i = 0; i < this.skillGroups.length; i++) {
                     let sg = this.skillGroups[i];
@@ -100,8 +102,8 @@
                     }
 
                     if (this.roles.length === 0) break;
-                    // const thisLevel = this.userProfile.roles[sg_id];
-                    const thisLevel = this.roles.find(r => r.level === 1);
+                    const thisLevel = this.userRoles[sg.id];
+                    // const thisLevel = this.roles.find(r => r.level === 1);
 
                     if (thisLevel.level < Math.max.apply(Math, this.roles.map(function (o) {
                         return o.level;
