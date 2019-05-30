@@ -1,55 +1,57 @@
 <template>
-    <div class="container">
-        <div class="m-userDetail__wrapper p-4">
-            <div class="row">
-                <div class="col-12 col-lg-3" id="m-userDetail__sidebar">
-                    <div class="m-userDetail__sidebarPanels">
-                        <div class="m-userDetail__sidebarProfile  -cardSidebar p-4">
-                            <h2 v-if="userProfile">
-                                {{ userProfile.name }} </h2>
-                            <p v-if="userProfile">
-                                Forecast ID: {{ userProfile.domoIdentifier }} </p>
-                            <o-user-role-breakdown></o-user-role-breakdown>
-                        </div>
-
-                        <div class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4" v-if="$route.params.id==='skills'">
-                            <h2>Role Progress</h2>
-                            <m-user-role-completion v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false"></m-user-role-completion>
-                        </div>
-
-                        <div class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4" v-if="$route.params.id==='goals'">
-                            <h2>Goals Progress</h2>
-
-                            <m-user-role-completion v-bind:listOfItems="userGoals" v-bind:showEmpty="true"></m-user-role-completion>
-                        </div>
-
-                        <div class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4" v-if="$route.params.id==='tribeverification'">
-                            <h2>Fake Meta</h2>
-
-                            <h3> Wipro Band</h3>
-
-                            <p>XX</p>
-
-                            <h3>Manager</h3>
-
-                            <p>Jane Doe</p>
-
-                            <h3> Next Band Reassessment</h3>
-                            <p> Dec 15, 2019</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class=" col-12 col-lg-9">
-                    <o-edit-skills @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState" v-bind:nextRoleLevels="nextRoleLevels" v-if="$route.params.id==='skills'"></o-edit-skills>
-
-                    <o-edit-goals @setLoadingState="setLoadingState" v-if="$route.params.id==='goals'"></o-edit-goals>
-
-                    <tribe-ver-listing @setLoadingState="setLoadingState" v-if="$route.params.id==='tribeverification'"></tribe-ver-listing>
-                </div>
+  <div class="container">
+    <div class="m-userDetail__wrapper p-4">
+      <div class="row">
+        <div id="m-userDetail__sidebar" class="col-12 col-lg-3">
+          <div class="m-userDetail__sidebarPanels">
+            <div class="m-userDetail__sidebarProfile  -cardSidebar p-4">
+              <h2 v-if="userProfile">
+                {{ userProfile.name }}
+              </h2>
+              <p v-if="userProfile">
+                Forecast ID: {{ userProfile.domoIdentifier }}
+              </p>
+              <o-user-role-breakdown></o-user-role-breakdown>
             </div>
+
+            <div v-if="$route.params.id==='skills'" class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4">
+              <h2>Role Progress</h2>
+              <m-user-role-completion v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false"></m-user-role-completion>
+            </div>
+
+            <div v-if="$route.params.id==='goals'" class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4">
+              <h2>Goals Progress</h2>
+
+              <m-user-role-completion v-bind:listOfItems="userGoals" v-bind:showEmpty="true"></m-user-role-completion>
+            </div>
+
+            <div v-if="$route.params.id==='tribeverification'" class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4">
+              <h2>Fake Meta</h2>
+
+              <h3> Wipro Band</h3>
+
+              <p>XX</p>
+
+              <h3>Manager</h3>
+
+              <p>Jane Doe</p>
+
+              <h3> Next Band Reassessment</h3>
+              <p> Dec 15, 2019</p>
+            </div>
+          </div>
         </div>
+
+        <div class=" col-12 col-lg-9">
+          <o-edit-skills v-if="$route.params.id==='skills'" v-bind:nextRoleLevels="nextRoleLevels" @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState"></o-edit-skills>
+
+          <o-edit-goals v-if="$route.params.id==='goals'" @setLoadingState="setLoadingState"></o-edit-goals>
+
+          <tribe-ver-listing v-if="$route.params.id==='tribeverification'" @setLoadingState="setLoadingState"></tribe-ver-listing>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -154,38 +156,38 @@
 
 
 <style scoped lang="scss">
-    @import "@/styles/main.scss";
+  @import "@/styles/main.scss";
 
-    .m-userDetail {
-        &__wrapper {
-
-        }
-
-        &__helperPanel {
-            &.hidden {
-                display: none;
-            }
-        }
-
-        &__sidebar {
-            margin-bottom: space(4);
-        }
-
-        &__sidebarPanels {
-            position: -webkit-sticky;
-            position: sticky;
-            top: 1.5rem;
-            z-index: $zindex-sticky;
-        }
-
-        &__sidebarProfile {
-            @include deepShadow(8, colorViz(4), 20%);
-        }
-
-        &__sidebarRoleProgress {
-            @include deepShadow(8, colorViz(7), 22%);
-        }
-
+  .m-userDetail {
+    &__wrapper {
 
     }
+
+    &__helperPanel {
+      &.hidden {
+        display: none;
+      }
+    }
+
+    &__sidebar {
+      margin-bottom: space(4);
+    }
+
+    &__sidebarPanels {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 1.5rem;
+      z-index: $zindex-sticky;
+    }
+
+    &__sidebarProfile {
+      @include deepShadow(8, colorViz(4), 20%);
+    }
+
+    &__sidebarRoleProgress {
+      @include deepShadow(8, colorViz(7), 22%);
+    }
+
+
+  }
 </style>

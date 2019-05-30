@@ -159,7 +159,7 @@ router.beforeEach((to, from, next) => {
 
     if (to.matched.some(record => record.meta.requireAuth)) {
         if (authentication.isAuthenticated()) {
-            store.commit('setCurrentUser', authentication.getUser());
+            // store.commit('setCurrentUser', authentication.getUser());
             next();
         } else {
             authentication.signIn();
