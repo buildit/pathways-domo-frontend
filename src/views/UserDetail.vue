@@ -49,7 +49,6 @@
 
     export default {
         components: {
-            TribeVerifications,
             OEditSkills,
             OEditGoals,
             MUserRoleCompletion,
@@ -77,17 +76,19 @@
                 'userGoals'
             ]),
             nextRoleLevels: function () {
+                console.log(this.skillGroupSkills);
                 let nextRoleLevels = {};
                 for (let i = 0; i < this.skillGroups.length; i++) {
                     let sg = this.skillGroups[i];
 
-                    if (this.userProfile == null || this.userProfile.userSkills == null) {
+                    if (this.userProfile.userSkills == null) {
                         console.error(`Catastrophy! Could not fetch skills for user {this.userProfile.username}`);
                         break;
                     }
 
                     if (this.roles.length === 0) break;
                     const thisLevel = this.userRoles[sg.id];
+                    // const thisLevel = this.roles.find(r => r.level === 1);
 
                     if (thisLevel.level < Math.max.apply(Math, this.roles.map(function (o) {
                         return o.level;
@@ -100,7 +101,7 @@
                         //const userCurrentLevelTotal = this.userProfile.roles[sg_id]['targetTracking'][r_id]['userPoints'];
                         //const progressAway = (userCurrentLevelTotal > 0) ? userCurrentLevelTotal / totalFromNextLevel : 0;
 
-                        const progressAway = Math.random() + .01;
+                        const progressAway = .01;
 
                         nextRoleLevels[sg.id] = {};
 

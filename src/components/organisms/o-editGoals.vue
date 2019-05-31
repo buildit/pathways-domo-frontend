@@ -41,27 +41,29 @@
 <script>
     import {mapState} from 'vuex';
 
-  export default {
-    name: "o-editGoals",
-    components: {},
-    filters: {},
-    data() {
-      return {
-        selected: [],
-        toggleShowOnlyUserGoals: false
-      };
-    },
-    computed: {
-      ...mapState([
-        'userProfile',
-        'currentUser',
-        'skillGroups',
-        'skills',
-        'skillLevels',
-        'roles'
-      ]),
-      currentGoalLevels: function () {
-        let currentGoalLevels = {};
+    const fb = require('../../services/firebaseConfig.js');
+
+    export default {
+        name: "o-editGoals",
+        components: {},
+        filters: {},
+        data() {
+            return {
+                selected: [],
+                toggleShowOnlyUserGoals: false
+            };
+        },
+        computed: {
+            ...mapState([
+                'userProfile',
+                'currentUser',
+                'skillGroups',
+                'skills',
+                'skillLevels',
+                'roles'
+            ]),
+            currentGoalLevels: function () {
+                let currentGoalLevels = {};
 
                 for (let s_id in this.skills) {
 

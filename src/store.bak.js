@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
-import api from './services/apiConfig';
+
+// https://blog.sqreen.com/authentication-best-practices-vue/
+const fb = require('./services/firebaseConfig.js');
 
 Vue.use(Vuex);
 
@@ -9,26 +11,17 @@ const store = new Vuex.Store({
     state: {
         currentUser: null,
         userProfile: {},
-        userRoles: null,
         skillGroups: {},
-        skillGroupSkills: {},
         skills: {},
         skillLevels: [],
         roles: [],
-        roleLevelRules: [],
         users: {},
         accessToken: localStorage.getItem('user-accessToken') || '',
         accessTokenStatus: '',
         datasetList: [],
         apiData: [],
         apiCallStatus: 200,
-        domoTokenAttempts: 0,
-        // Temp for debug
-        fbroles: [],
-        fbusers: [],
-        fbskillGroups: [],
-        fbskillLevels: [],
-        fbskills: [],
+        domoTokenAttempts: 0
     },
     getters: {
         qualifiedUsersBySkillGroup: state => {
@@ -144,85 +137,28 @@ const store = new Vuex.Store({
             commit('setSkillGroups', null);
         },
         fetchUserProfile({commit, state}) {
-            api.User.get(state.currentUser.email).then(res => {
-
+            state.currentUser.email;
+            fb.usersCollection.doc(state.currentUser.email).get().then(res => {
                 console.log('committing ' + res.data.username);
-                if (res.data.directoryName == null) {
-                    res.data.directoryName = state.currentUser.name;
-                    res.data.name = state.currentUser.name.replace(' (Digital)', '');
-                    store.dispatch('updateProfile', res.data);
-                }
-
                 commit('setUserProfile', res.data);
-
-                if (res.data != null) {
-                    store.dispatch('fetchAllData', res).then(res => {
-                        console.log("finished running fetchalldata");
-                    });
-                }
             }).catch(err => {
                 console.log(err);
             });
-            return null;
-        },
-        setUserRoles({commit, state}, data) {
-            let skillset = state.userProfile.userSkills;
-            let rules = state.roleLevelRules;
-            let userRoles = {};
-            let rulesMap = {};
-
-            let skillGroupSkillSet = {};
-
-            // break down rule set into roles
-            data.forEach(function (r) {
-                if (rulesMap[r.roleTypeId] == null) {
-                    rulesMap[r.roleTypeId] = {
-                        rLevels: {},
-                    };
-                }
-
-                if (rulesMap[r.roleTypeId].rLevels[r.roleLevelId] == null) {
-                    rulesMap[r.roleTypeId].rLevels[r.roleLevelId] = [];
-                }
-
-                if (skillGroupSkillSet[r.roleTypeId] == null) {
-                    skillGroupSkillSet[r.roleTypeId] = {skills: new Set()};
-                }
-
-                skillGroupSkillSet[r.roleTypeId].skills.add(state.skills.find(s => s.id === r.skillTypeId));
-
-                rulesMap[r.roleTypeId].rLevels[r.roleLevelId].push({type: r.skillTypeId, level: r.skillLevelId});
-
-            });
-
-            console.log(skillGroupSkillSet);
-
-            this.state.skillGroups.forEach(sg => {
-                userRoles[sg.id] = this.state.roles.find(r => r.level === 0);
-            });
-
-            // find out which roles user is eligible for
-            /*rulesMap.forEach(function (rm) {
-                let mappedRoles = [];
-                if (!skillset.includes(s => s.skillTypeId === rm.skillTypeId)) {
-                    mappedRoles.push();
-                } else {
-
-                }
-                userRoles[rm.roleTypeId] = mappedRoles;
-            });*/
-            store.commit('setSkillGroupSkills', skillGroupSkillSet);
-            store.commit('setUserRoles', userRoles);
         },
         updateProfile({commit, state}, data) {
-            api.User.update(data).then(user => {
-                console.log('User profile updated.');
+            let user_first_name = data.user_first_name;
+            let user_last_name = data.user_last_name;
+
+            fb.usersCollection.doc(state.currentUser.uid).update({user_first_name, user_last_name}).then(user => {
+
             }).catch(err => {
                 console.log(err);
             });
         },
         updateUserRoleLevels({commit, state}) {
             let newRoleLevels = {};
+
+
             for (let sg_id in state.skillGroups) {
                 const currentGroup = state.skillGroups[sg_id];
 
@@ -281,6 +217,7 @@ const store = new Vuex.Store({
                     } // if hit the criteria
                 } // for roles
             }
+
             fb.usersCollection.doc(state.currentUser.uid).set({
                 roles: newRoleLevels
             }, {
@@ -292,35 +229,79 @@ const store = new Vuex.Store({
             });
         },
         fetchAllData({commit, state}, user) {
-            const usersRequest = api.User.getAll().then(res => {
-                store.commit('setUsers', res.data);
-            });
+            store.commit('setCurrentUser', user);
 
-            const rolesRequest = api.Role.getAll().then(res => {
-                store.commit('setRoles', res.data);
-            });
+            fb.usersCollection.doc(user.uid).onSnapshot(doc => {
+                store.commit('setUserProfile', doc.data());
 
-            const skillGroupRequest = api.Role.getAllTypes().then(res => {
-                store.commit('setSkillGroups', res.data);
-            });
 
-            const skillsRequest = api.Skill.getAll().then(res => {
-                store.commit('setSkills', res.data);
-            });
+            }); // user
 
-            const skillLevelsRequest = api.Skill.getAllLevels().then(res => {
-                store.commit('setSkillLevels', res.data);
-            });
+            fb.usersCollection.onSnapshot(querySnapshot => {
+                let tempArray = {};
 
-            const rulesRequest = api.RoleLevelRule.getAll().then(res => {
-                store.commit('setRoleLevelRules', res.data);
-                store.dispatch('setUserRoles', res.data);
-            });
-
-            Promise.all([usersRequest, rolesRequest, skillGroupRequest, skillsRequest, skillLevelsRequest])
-                .then(() => {
-                    return rulesRequest;
+                querySnapshot.forEach(doc => {
+                    let user = doc.data();
+                    tempArray[doc.id] = user;
                 });
+
+                store.commit('setUsers', tempArray);
+            }); // skill groups
+
+            fb.skillGroupsCollection.onSnapshot(querySnapshot => {
+                let tempArray = {};
+
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    tempArray[doc.id] = group;
+                });
+
+                store.commit('setSkillGroups', tempArray);
+
+
+            }); // skill groups
+
+            fb.skillsCollection.onSnapshot(querySnapshot => {
+                let tempArray = {};
+
+                querySnapshot.forEach(doc => {
+                    let post = doc.data();
+                    tempArray[doc.id] = post;
+                });
+
+                store.commit('setSkills', tempArray);
+
+
+            }); // skills
+
+            fb.skillLevelsCollection.orderBy('level', 'asc').onSnapshot(querySnapshot => {
+                let tempArray = [];
+
+                querySnapshot.forEach(doc => {
+                    let post = doc.data();
+                    post.sl_id = doc.id;
+
+                    tempArray.push(post);
+                });
+
+                store.commit('setSkillLevels', tempArray);
+            });
+
+            fb.rolesCollection.orderBy('level', 'asc').onSnapshot(querySnapshot => {
+                let tempArray = [];
+
+                querySnapshot.forEach(doc => {
+                    let post = doc.data();
+                    post.r_id = doc.id;
+
+                    tempArray.push(post);
+
+                });
+
+                store.commit('setRoles', tempArray);
+            }); // roles
+
+
         }, // fetch all data
         requestAccessToken({commit, dispatch}) {
             // TODO: Backend Request
@@ -429,18 +410,12 @@ const store = new Vuex.Store({
         }
     },
     mutations: {
+
         setCurrentUser(state, val) {
             state.currentUser = val;
         },
         setUserProfile(state, val) {
             state.userProfile = val;
-        },
-        setUserRoles(state, val) {
-            if (val) {
-                state.userRoles = val;
-            } else {
-                state.userRoles = {};
-            }
         },
         setSkillGroups(state, val) {
             if (val) {
@@ -526,20 +501,7 @@ const store = new Vuex.Store({
                 state.apiCallStatus = '';
             }
         },
-        setRoleLevelRules(state, val) {
-            if (val) {
-                state.roleLevelRules = val;
-            } else {
-                state.roleLevelRules = [];
-            }
-        },
-        setSkillGroupSkills(state, val) {
-            if (val) {
-                state.skillGroupSkills = val;
-            } else {
-                state.skillGroupSkills = [];
-            }
-        },
+
     }
 });
 
