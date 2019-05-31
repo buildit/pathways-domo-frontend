@@ -8,7 +8,6 @@
     </button>
   </div>
 </template>
-
 <script>
     import {mapState} from 'vuex';
 
@@ -125,7 +124,6 @@
 
 
 </script>
-
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 

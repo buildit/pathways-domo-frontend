@@ -1,14 +1,13 @@
 <template>
-  <div class="m-userDetail__skillGroups container">
-    <div class="row">
-      <div class="col-12">
-        <h1>Self-Assessment</h1>
-      </div>
-      <o-skill-groups v-bind:nextRoleLevels="nextRoleLevels" @setHelpPanelContent="setHelpPanelContent"></o-skill-groups>
+    <div class="m-userDetail__skillGroups container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Self-Assessment</h1>
+            </div>
+            <o-skill-groups @setHelpPanelContent="setHelpPanelContent" v-bind:nextRoleLevels="nextRoleLevels"></o-skill-groups>
+        </div>
     </div>
-  </div>
 </template>
-
 <script>
     import {mapState} from 'vuex';
     import OSkillLevel__panel from "../organisms/o-skillLevel__panel";
@@ -104,8 +103,6 @@
         }
     };
 </script>
-
-
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
