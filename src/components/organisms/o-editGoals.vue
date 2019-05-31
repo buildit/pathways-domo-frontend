@@ -66,8 +66,6 @@
 <script>
   import { mapState } from 'vuex';
 
-  const fb = require('../../services/firebaseConfig.js');
-
   export default {
     name: "o-editGoals",
     components: {},

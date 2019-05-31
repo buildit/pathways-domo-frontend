@@ -16,7 +16,7 @@
 
             <div v-if="$route.params.id==='skills'" class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4">
               <h2>Role Progress</h2>
-                <m-user-role-completion v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false" v-if="userRoles"></m-user-role-completion>
+              <m-user-role-completion v-if="userRoles" v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false"></m-user-role-completion>
             </div>
 
             <div v-if="$route.params.id==='goals'" class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4">
@@ -25,28 +25,19 @@
               <m-user-role-completion v-bind:listOfItems="userGoals" v-bind:showEmpty="true"></m-user-role-completion>
             </div>
 
-            <div v-if="$route.params.id==='tribeverification'" class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4">
-              <h2>Fake Meta</h2>
-
-                <h3>Wipro Band</h3>
-
-              <p>XX</p>
-
-              <h3>Manager</h3>
-
-              <p>Jane Doe</p>
-
-              <h3> Next Band Reassessment</h3>
-              <p> Dec 15, 2019</p>
-            </div>
+            <TribeVerifications/>
           </div>
         </div>
 
         <div class=" col-12 col-lg-9">
-            <o-edit-skills @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState" v-bind:nextRoleLevels="nextRoleLevels" v-if="$route.params.id==='skills' && userRoles"></o-edit-skills>
+
+          <o-edit-skills v-if="$route.params.id==='skills' && userRoles"
+                         v-bind:nextRoleLevels="nextRoleLevels"
+                         @setHelpPanelContent="setHelpPanelContent"
+                         @setLoadingState="setLoadingState">
+          </o-edit-skills>
 
           <o-edit-goals v-if="$route.params.id==='goals'" @setLoadingState="setLoadingState"></o-edit-goals>
-
           <tribe-ver-listing v-if="$route.params.id==='tribeverification'" @setLoadingState="setLoadingState"></tribe-ver-listing>
         </div>
       </div>
@@ -61,9 +52,11 @@
     import OEditSkills from "../components/organisms/o-editSkills";
     import OEditGoals from "../components/organisms/o-editGoals";
     import TribeVerListing from '../components/molecules/m-tribeVerListing';
+    import TribeVerifications from "./TribeVerifications";
 
     export default {
         components: {
+            TribeVerifications,
             OEditSkills,
             OEditGoals,
             MUserRoleCompletion,
@@ -91,19 +84,17 @@
                 'userGoals'
             ]),
             nextRoleLevels: function () {
-                console.log(this.skillGroupSkills);
                 let nextRoleLevels = {};
                 for (let i = 0; i < this.skillGroups.length; i++) {
                     let sg = this.skillGroups[i];
 
-                    if (this.userProfile.userSkills == null) {
+                    if (this.userProfile == null || this.userProfile.userSkills == null) {
                         console.error(`Catastrophy! Could not fetch skills for user {this.userProfile.username}`);
                         break;
                     }
 
                     if (this.roles.length === 0) break;
                     const thisLevel = this.userRoles[sg.id];
-                    // const thisLevel = this.roles.find(r => r.level === 1);
 
                     if (thisLevel.level < Math.max.apply(Math, this.roles.map(function (o) {
                         return o.level;
@@ -116,7 +107,7 @@
                         //const userCurrentLevelTotal = this.userProfile.roles[sg_id]['targetTracking'][r_id]['userPoints'];
                         //const progressAway = (userCurrentLevelTotal > 0) ? userCurrentLevelTotal / totalFromNextLevel : 0;
 
-                        const progressAway = .01;
+                        const progressAway = Math.random() + .01;
 
                         nextRoleLevels[sg.id] = {};
 
