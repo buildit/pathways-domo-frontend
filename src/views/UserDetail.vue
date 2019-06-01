@@ -1,55 +1,45 @@
 <template>
-    <div class="container">
-        <div class="m-userDetail__wrapper p-4">
-            <div class="row">
-                <div class="col-12 col-lg-3" id="m-userDetail__sidebar">
-                    <div class="m-userDetail__sidebarPanels">
-                        <div class="m-userDetail__sidebarProfile  -cardSidebar p-4">
-                            <h2 v-if="userProfile">
-                                {{ fullName }} </h2>
-                            <p v-if="userProfile">
-                                Forecast ID: {{ userProfile.domoIdentifier }} </p>
-                            <o-user-role-breakdown></o-user-role-breakdown>
-                        </div>
-
-                        <div class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4" v-if="$route.params.id==='skills'">
-                            <h2>Role Progress</h2>
-                            <m-user-role-completion v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false"></m-user-role-completion>
-                        </div>
-
-                        <div class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4" v-if="$route.params.id==='goals'">
-                            <h2>Goals Progress</h2>
-
-                            <m-user-role-completion v-bind:listOfItems="userGoals" v-bind:showEmpty="true"></m-user-role-completion>
-                        </div>
-
-                        <div class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4" v-if="$route.params.id==='tribeverification'">
-                            <h2>Fake Meta</h2>
-
-                            <h3> Wipro Band</h3>
-
-                            <p>XX</p>
-
-                            <h3>Manager</h3>
-
-                            <p>Jane Doe</p>
-
-                            <h3> Next Band Reassessment</h3>
-                            <p> Dec 15, 2019</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class=" col-12 col-lg-9">
-                    <o-edit-skills @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState" v-bind:nextRoleLevels="nextRoleLevels" v-if="$route.params.id==='skills'"></o-edit-skills>
-
-                    <o-edit-goals @setLoadingState="setLoadingState" v-if="$route.params.id==='goals'"></o-edit-goals>
-
-                    <tribe-ver-listing @setLoadingState="setLoadingState" v-if="$route.params.id==='tribeverification'"></tribe-ver-listing>
-                </div>
+  <div class="container">
+    <div class="m-userDetail__wrapper p-4">
+      <div class="row">
+        <div id="m-userDetail__sidebar" class="col-12 col-lg-3">
+          <div class="m-userDetail__sidebarPanels">
+            <div class="m-userDetail__sidebarProfile  -cardSidebar p-4">
+              <h2 v-if="userProfile">
+                {{ userProfile.name }}
+              </h2>
+              <p v-if="userProfile">
+                Forecast ID: {{ userProfile.domoIdentifier }}
+              </p>
+              <o-user-role-breakdown></o-user-role-breakdown>
             </div>
+
+            <div v-if="$route.params.id==='skills'" class="m-userDetail__sidebarRoleProgress -cardSidebar my-4 p-4">
+              <h2>Role Progress</h2>
+              <m-user-role-completion v-if="userRoles" v-bind:listOfItems="nextRoleLevels" v-bind:showEmpty="false"></m-user-role-completion>
+            </div>
+
+            <div v-if="$route.params.id==='goals'" class="m-userDetail__sidebarRoleProgress  -cardSidebar my-4 p-4">
+              <h2>Goals Progress</h2>
+
+              <m-user-role-completion v-bind:listOfItems="userGoals" v-bind:showEmpty="true"></m-user-role-completion>
+            </div>
+            <TribeVerifications/>
+          </div>
         </div>
+
+        <div class=" col-12 col-lg-9">
+          <o-edit-skills v-if="$route.params.id==='skills' && userRoles"
+                         v-bind:nextRoleLevels="nextRoleLevels"
+                         @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState">
+          </o-edit-skills>
+
+          <o-edit-goals v-if="$route.params.id==='goals'" @setLoadingState="setLoadingState"></o-edit-goals>
+          <tribe-ver-listing v-if="$route.params.id==='tribeverification'" @setLoadingState="setLoadingState"></tribe-ver-listing>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -59,9 +49,11 @@
     import OEditSkills from "../components/organisms/o-editSkills";
     import OEditGoals from "../components/organisms/o-editGoals";
     import TribeVerListing from '../components/molecules/m-tribeVerListing';
+    import TribeVerifications from "./TribeVerifications";
 
     export default {
         components: {
+            TribeVerifications,
             OEditSkills,
             OEditGoals,
             MUserRoleCompletion,
@@ -80,49 +72,52 @@
                 'skillGroups',
                 'skills',
                 'skillLevels',
-                'roles'
+                'roles',
+                'roleLevelRules',
+                'userRoles',
+                'skillGroupSkills'
             ]),
             ...mapGetters([
                 'userGoals'
             ]),
-            fullName: function () {
-                if (this.currentUser != null && this.currentUser.profile != null) {
-                    return this.currentUser.profile.name;
-                }
-
-                return null;
-            },
             nextRoleLevels: function () {
                 let nextRoleLevels = {};
+                for (let i = 0; i < this.skillGroups.length; i++) {
+                    let sg = this.skillGroups[i];
 
+                    if (this.userProfile == null || this.userProfile.userSkills == null) {
+                        console.error(`Catastrophy! Could not fetch skills for user {this.userProfile.username}`);
+                        break;
+                    }
 
-                // console.log(this.roleLevels)
-                for (let sg_id in this.skillGroups) {
-                    if (this.userProfile.roles[sg_id]) {
-                        const thisLevel = this.userProfile.roles[sg_id];
+                    if (this.roles.length === 0) break;
+                    const thisLevel = this.userRoles[sg.id];
 
-                        if (thisLevel.level < this.roles.length - 1) {
-                            const nextLevel = parseInt(thisLevel.level) + 1;
+                    if (thisLevel.level < Math.max.apply(Math, this.roles.map(function (o) {
+                        return o.level;
+                    }))) {
+                        const nextLevel = parseInt(thisLevel.level) + 1;
 
-                            const r_id = this.roles[nextLevel]['r_id'];
+                        // const r_id = this.roles.find[nextLevel]['r_id'];
 
-                            const totalFromNextLevel = this.userProfile.roles[sg_id]['targetTracking'][r_id]['total'];
-                            const userCurrentLevelTotal = this.userProfile.roles[sg_id]['targetTracking'][r_id]['userPoints'];
-                            const progressAway = (userCurrentLevelTotal > 0) ? userCurrentLevelTotal / totalFromNextLevel : 0;
+                        //const totalFromNextLevel = this.userProfile.roles[sg_id]['targetTracking'][r_id]['total'];
+                        //const userCurrentLevelTotal = this.userProfile.roles[sg_id]['targetTracking'][r_id]['userPoints'];
+                        //const progressAway = (userCurrentLevelTotal > 0) ? userCurrentLevelTotal / totalFromNextLevel : 0;
 
-                            nextRoleLevels[sg_id] = {};
+                        const progressAway = Math.random() + .01;
 
-                            nextRoleLevels[sg_id]['role_name'] = this.roles[nextLevel]['name'];
-                            nextRoleLevels[sg_id]['progressCompleted'] = progressAway;
-                            nextRoleLevels[sg_id]['group_name'] = this.skillGroups[sg_id]['name'];
-                            nextRoleLevels[sg_id]['title'] = this.skillGroups[sg_id]['title'];
+                        nextRoleLevels[sg.id] = {};
 
-                            // loop thru roles
-                            // compare each with
-                        } else {
-                            nextRoleLevels[sg_id] = false;
-                        } // check if user is already maxed out
-                    } // if group exists in roleLevels. it should though...
+                        nextRoleLevels[sg.id]['role_name'] = this.roles.find(r => r.level === nextLevel)['name'];
+                        nextRoleLevels[sg.id]['progressCompleted'] = progressAway;
+                        nextRoleLevels[sg.id]['group_name'] = sg['name'];
+                        nextRoleLevels[sg.id]['title'] = sg['title'];
+
+                        // loop thru roles
+                        // compare each with
+                    } else {
+                        nextRoleLevels[sg.id] = false;
+                    } // check if user is already maxed out
                 } // for skill groups
 
 
@@ -151,39 +146,38 @@
 
 
 <style scoped lang="scss">
-    @import "@/styles/main.scss";
+  @import "@/styles/main.scss";
 
-
-    .m-userDetail {
-        &__wrapper {
-
-        }
-
-        &__helperPanel {
-            &.hidden {
-                display: none;
-            }
-        }
-
-        &__sidebar {
-            margin-bottom: space(4);
-        }
-
-        &__sidebarPanels {
-            position: -webkit-sticky;
-            position: sticky;
-            top: 6.5rem;
-            z-index: $zindex-sticky;
-        }
-
-        &__sidebarProfile {
-            @include deepShadow(8, colorViz(4), 20%);
-        }
-
-        &__sidebarRoleProgress {
-            @include deepShadow(8, colorViz(7), 22%);
-        }
-
+  .m-userDetail {
+    &__wrapper {
 
     }
+
+    &__helperPanel {
+      &.hidden {
+        display: none;
+      }
+    }
+
+    &__sidebar {
+      margin-bottom: space(4);
+    }
+
+    &__sidebarPanels {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 1.5rem;
+      z-index: $zindex-sticky;
+    }
+
+    &__sidebarProfile {
+      @include deepShadow(8, colorViz(4), 20%);
+    }
+
+    &__sidebarRoleProgress {
+      @include deepShadow(8, colorViz(7), 22%);
+    }
+
+
+  }
 </style>

@@ -1,25 +1,22 @@
 <template>
-  <button
-    class="__moreInfo"
-    @click="setHelpPanelContent()"
-  >
+  <button class="__moreInfo" @click="setHelpPanelContent()">
     ?
   </button>
 </template>
 
 <script>
-  export default {
-    name: "AHelpButton",
-    props: {
-      id: String,
-      type: String
-    },
-    methods: {
-      setHelpPanelContent() {
-        this.$emit('setHelpPanelContent', {id: this.id, type: this.type});
-      }
-    }
-  };
+    export default {
+        name: "AHelpButton",
+        props: {
+            id: Number,
+            type: String
+        },
+        methods: {
+            setHelpPanelContent() {
+                this.$emit('setHelpPanelContent', {id: this.id, type: this.type});
+            }
+        }
+    };
 </script>
 
 <style scoped lang="scss">

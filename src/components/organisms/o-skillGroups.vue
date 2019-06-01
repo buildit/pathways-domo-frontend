@@ -1,61 +1,29 @@
 <template>
   <div class="m-userDetail__skillsContainer pb-4 col-12">
-    <template v-for="(group, group_key) in skillGroups">
-      <div
-        :id.prop="'sg_'+group.name"
-        class="m-userDetail__skillGroup mb-6 p-4"
-      >
+    <template v-for="(group) in skillGroups">
+      <div :id.prop="'sg_'+group.name" class="m-userDetail__skillGroup mb-6 p-4">
         <div class="d-flex justify-content-between">
           <h2>{{ group.name }}</h2>
-
-          <a-help-button
-            v-bind:id="group_key"
-            v-bind:type="'group'"
-            @setHelpPanelContent="setHelpPanelContent"
-          >
-          </a-help-button>
+          <a-help-button v-bind:id="group.id" v-bind:type="'group'" @setHelpPanelContent="setHelpPanelContent"></a-help-button>
         </div>
         <ul class="m-userDetail__roleStrip my-0 mb-4 p-0">
-          <li v-if="userProfile.roles[group_key]">
-            <b>Current Level:</b> {{ userProfile.roles[group_key].level_name }}
+          <li v-if="userRoles[group.id]">
+            <b>Current Level:</b> {{ userRoles[group.id].name }}
           </li>
-          <li v-if="nextRoleLevels[group_key]">
-            <b>Up Next:</b> {{ nextRoleLevels[group_key]['role_name'] }} ({{
-              Math.round(nextRoleLevels[group_key]['progressCompleted'] * 100) }}% Completed)
+          <li v-if="nextRoleLevels[group.id]">
+            <b>Up Next:</b> {{ nextRoleLevels[group.id]['role_name'] }} ({{
+            Math.round(nextRoleLevels[group.id]['progressCompleted'] * 100) }}% Completed)
           </li>
         </ul>
-
         <ul class="m-userDetail__skillList m-0 p-0 d-flex flex-wrap">
-          <template v-for="skill in group.skills">
-            <li
-
-              class="col-6  d-flex px-2 mb-2"
-            >
-              <div
-                class="m-userDetail__skillListContent p-4 m-1 flex-grow-1 "
-                :class="{'-isRequired': skill.required}"
-              >
+          <template v-for="skill in skillGroupSkills[group.id].skills">
+            <li class="col-6  d-flex px-2 mb-2">
+              <div class="m-userDetail__skillListContent p-4 m-1 flex-grow-1 ">
                 <div class="d-flex justify-content-between flex-grow-0">
-                  <p class="-requiredSkill">
-                    {{ skill.name }}
-                  </p>
-
-                  <a-help-button
-                    v-bind:id="skill.s_id"
-                    v-bind:type="'skill'"
-                    @setHelpPanelContent="setHelpPanelContent"
-                  >
-                  </a-help-button>
+                  <p class="-requiredSkill">{{ skill.name }} </p>
+                  <a-help-button v-bind:id="skill.id" v-bind:type="'skill'" @setHelpPanelContent="setHelpPanelContent"></a-help-button>
                 </div>
-
-
-                <o-skill-level__panel
-                  v-bind:group="group"
-                  v-bind:group_key="group_key"
-                  v-bind:skill="skill"
-                  v-bind:skill_key="skill.s_id"
-                >
-                </o-skill-level__panel>
+                <o-skill-level__panel v-bind:group="group" v-bind:group_key="group.id" v-bind:skill="skill" v-bind:skill_key="skill.id"></o-skill-level__panel>
               </div>
             </li>
           </template>
@@ -64,56 +32,55 @@
     </template>
   </div>
 </template>
-
 <script>
-  import { mapState } from 'vuex';
-  import OSkillLevel__panel from "./o-skillLevel__panel";
-  import AHelpButton from "../atoms/a-helpButton";
+    import {mapState} from 'vuex';
+    import OSkillLevel__panel from "./o-skillLevel__panel";
+    import AHelpButton from "../atoms/a-helpButton";
 
-  export default {
+    export default {
 
-    name: "o-skillGroups",
-    components: {AHelpButton, OSkillLevel__panel},
-    filters: {
-      truncateString(val, truncateLength) {
-        if (val.length < truncateLength) {
-          return val;
+        name: "o-skillGroups",
+        components: {AHelpButton, OSkillLevel__panel},
+        filters: {
+            truncateString(val, truncateLength) {
+                if (val.length < truncateLength) {
+                    return val;
+                }
+                return `${val.substring(0, truncateLength).trim()}…`;
+            }
+
+        },
+        props: {
+            nextRoleLevels: Object
+        },
+        data() {
+            return {
+                highlightStates: {}
+            };
+        },
+        computed: {
+            ...mapState([
+                'userProfile',
+                'currentUser',
+                'skillGroups',
+                'skills',
+                'skillLevels',
+                'roles',
+                'userRoles',
+                'skillGroupSkills'
+            ])
+        },
+
+        mounted: function () {
+
+        },
+        methods: {
+            setHelpPanelContent(e) {
+                this.$emit('setHelpPanelContent', e);
+            }
         }
-        return `${val.substring(0, truncateLength).trim()}…`;
-      }
-
-    },
-    props: {
-      nextRoleLevels: Object
-    },
-    data() {
-      return {
-        highlightStates: {}
-      };
-    },
-    computed: {
-      ...mapState([
-        'userProfile',
-        'currentUser',
-        'skillGroups',
-        'skills',
-        'skillLevels',
-        'roles'
-      ])
-    },
-
-
-    mounted: function () {
-
-    },
-    methods: {
-      setHelpPanelContent(e) {
-        this.$emit('setHelpPanelContent', e);
-      }
-    }
-  };
+    };
 </script>
-
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
@@ -161,7 +128,6 @@
             }
           }
 
-
           &__skillListMetadata {
             span {
               background-color: $success;
@@ -200,16 +166,10 @@
               &.-level4 {
                 background-color: $success;
               }
-
-
             }
-
-
           }
         }
       }
     }
-
-
   }
 </style>

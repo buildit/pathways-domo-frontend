@@ -4,119 +4,111 @@
       <div class="col-12">
         <h1>Self-Assessment</h1>
       </div>
-      <o-skill-groups
-        v-bind:nextRoleLevels="nextRoleLevels"
-        @setHelpPanelContent="setHelpPanelContent"
-      ></o-skill-groups>
+      <o-skill-groups v-bind:nextRoleLevels="nextRoleLevels" @setHelpPanelContent="setHelpPanelContent"></o-skill-groups>
     </div>
   </div>
 </template>
 
 <script>
-  import { mapState } from 'vuex';
-  import OSkillLevel__panel from "../organisms/o-skillLevel__panel";
-  import OSkillGroups from "../organisms/o-skillGroups";
-  import OUserRoleBreakdown from "../organisms/o-userRoleBreakdown";
-  import OHelpPanel__content from "../organisms/o-helpPanel__content";
-  import MUserRoleCompletion from "../molecules/m-userRoleCompletion";
-  import OEditSkills from "../organisms/o-editSkills";
+    import {mapState} from 'vuex';
+    import OSkillLevel__panel from "../organisms/o-skillLevel__panel";
+    import OSkillGroups from "../organisms/o-skillGroups";
+    import OUserRoleBreakdown from "../organisms/o-userRoleBreakdown";
+    import OHelpPanel__content from "../organisms/o-helpPanel__content";
+    import MUserRoleCompletion from "../molecules/m-userRoleCompletion";
+    import OEditSkills from "../organisms/o-editSkills";
 
-  const fb = require('../../services/firebaseConfig.js');
+    export default {
+        name: "o-editSkills",
+        components: {
+            OEditSkills,
+            MUserRoleCompletion,
+            OHelpPanel__content,
+            OUserRoleBreakdown,
+            OSkillGroups,
+            OSkillLevel__panel
+        },
+        filters: {},
+        props: {
+            nextRoleLevels: Object
+        },
+        data() {
+            return {
+                selected: []
+            };
+        },
+        computed: {
+            ...mapState([
+                'userProfile',
+                'currentUser',
+                'skillGroups',
+                'skills',
+                'skillLevels',
+                'roles',
+                'userRoles'
+            ])
+        },
+        created: function () {
+            this.$emit('setLoadingState', true);
+        },
+        mounted: function () {
+            this.$emit('setLoadingState', false);
+        },
+        methods: {
+            setSkill(level, group_key, skill) {
+                let currentUserProfile = this.userProfile;
 
-  export default {
-    name: "o-editSkills",
-    components: {
-      OEditSkills,
-      MUserRoleCompletion,
-      OHelpPanel__content,
-      OUserRoleBreakdown,
-      OSkillGroups,
-      OSkillLevel__panel
-    },
-    filters: {},
-    props: {
-      nextRoleLevels: Object
-    },
-    data() {
-      return {
-        selected: []
-      };
-    },
-    computed: {
-      ...mapState([
-        'userProfile',
-        'currentUser',
-        'skillGroups',
-        'skills',
-        'skillLevels',
-        'roles'
-      ])
-    },
-    created: function () {
-      this.$emit('setLoadingState', true);
-    },
-    mounted: function () {
-      this.$emit('setLoadingState', false);
-    },
-    methods: {
-      setSkill(level, group_key, skill) {
-        let currentUserProfile = this.userProfile;
-
-        console.log(currentUserProfile['skills'][skill.s_id]);
+                console.log(currentUserProfile['skills'][skill.s_id]);
 
 
-        if (!currentUserProfile['skills'][skill.s_id]) {
-          currentUserProfile['skills'][skill.s_id] = {
-            group_name: this.skillGroups[group_key]['name'],
-            level: 0,
-            level_name: this.skillLevels[0]['name'],
-            s_id: skill.s_id,
-            skill_name: skill.name,
-            sl_id: this.skillLevels[0]['sl_id']
-          };
+                if (!currentUserProfile['skills'][skill.s_id]) {
+                    currentUserProfile['skills'][skill.s_id] = {
+                        group_name: this.skillGroups[group_key]['name'],
+                        level: 0,
+                        level_name: this.skillLevels[0]['name'],
+                        s_id: skill.s_id,
+                        skill_name: skill.name,
+                        sl_id: this.skillLevels[0]['sl_id']
+                    };
+                }
+
+                currentUserProfile['skills'][skill.s_id]['level_goal'] = level;
+
+                console.log(currentUserProfile['skills'][skill.s_id]);
+
+                fb.usersCollection.doc(this.currentUser.uid).update({
+                    skills: currentUserProfile['skills']
+                }).then(ref => {
+
+                }).catch(err => {
+                    console.log(err);
+                });
+            },
+            getCurrentSkillLevel(s_id) {
+                if (this.userProfile.skills[s_id]) {
+                    return this.userProfile.skills[s_id]['level'];
+                }
+                return 0;
+            },
+            getCurrentGoalLevel(s_id) {
+                if (this.userProfile.skills[s_id]) {
+                    if (this.userProfile.skills[s_id]['level_goal']) {
+                        return this.userProfile.skills[s_id]['level_goal']['level'];
+                    }
+                }
+                return '—';
+            },
+            setHelpPanelContent(e) {
+                this.$emit('setHelpPanelContent', e);
+            }
         }
-
-        currentUserProfile['skills'][skill.s_id]['level_goal'] = level;
-
-
-        // console.log(group_key)
-
-        // user / user id / goals / skill id / level + level id + skill name
-
-        console.log(currentUserProfile['skills'][skill.s_id]);
-
-        fb.usersCollection.doc(this.currentUser.uid).update({
-          skills: currentUserProfile['skills']
-        }).then(ref => {
-
-        }).catch(err => {
-          console.log(err);
-        });
-      },
-      getCurrentSkillLevel(s_id){
-        if (this.userProfile.skills[s_id]){
-          return this.userProfile.skills[s_id]['level'];
-        }
-        return 0;
-      },
-      getCurrentGoalLevel(s_id){
-        if (this.userProfile.skills[s_id]){
-          if (this.userProfile.skills[s_id]['level_goal']) {
-            return this.userProfile.skills[s_id]['level_goal']['level'];
-          }
-        }
-        return '—';
-      },
-      setHelpPanelContent(e) {
-        this.$emit('setHelpPanelContent', e);
-      }
-    }
-  };
+    };
 </script>
 
 
 <style scoped lang="scss">
   @import "@/styles/main.scss";
+
   h1 {
     margin-bottom: space(4);
   }

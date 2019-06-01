@@ -1,5 +1,4 @@
 import firebase from 'firebase';
-import 'firebase/firestore';
 import store from '../store';
 
 // Initialize Firebase
@@ -32,7 +31,7 @@ fbusersCollection.onSnapshot(querySnapshot => {
         tempArray[doc.id] = user;
     });
 
-    store.commit('setUsers', tempArray);
+    store.commit('setfbUsers', tempArray);
 }); // skill groups
 
 fbskillGroupsCollection.onSnapshot(qs => {
@@ -43,9 +42,8 @@ fbskillGroupsCollection.onSnapshot(qs => {
         tempArray[doc.id] = user;
     });
 
-    store.commit('setSkillGroups', tempArray);
+    store.commit('setfbSkillGroups', tempArray);
 });
-
 
 fbrolesCollection.onSnapshot(qs => {
     let tempArray = {};
@@ -55,10 +53,49 @@ fbrolesCollection.onSnapshot(qs => {
         tempArray[doc.id] = user;
     });
 
-    store.commit('setRoles', tempArray);
+    store.commit('setfbRoles', tempArray);
 });
 
+fbskillsCollection.onSnapshot(querySnapshot => {
+    let tempArray = {};
+
+    querySnapshot.forEach(doc => {
+        let post = doc.data();
+        tempArray[doc.id] = post;
+    });
+
+    store.commit('setfbSkills', tempArray);
+}); // skills
+
+fbskillLevelsCollection.orderBy('level', 'asc').onSnapshot(querySnapshot => {
+    let tempArray = [];
+
+    querySnapshot.forEach(doc => {
+        let post = doc.data();
+        post.sl_id = doc.id;
+
+        tempArray.push(post);
+    });
+
+    store.commit('setfbSkillLevels', tempArray);
+});
+
+fbrolesCollection.orderBy('level', 'asc').onSnapshot(querySnapshot => {
+    let tempArray = [];
+
+    querySnapshot.forEach(doc => {
+        let post = doc.data();
+        post.r_id = doc.id;
+
+        tempArray.push(post);
+
+    });
+
+    store.commit('setfbRoles', tempArray);
+}); // roles
+
 export {
+    fbusersCollection,
     fbrolesCollection,
     fbskillGroupsCollection,
     fbskillLevelsCollection,
