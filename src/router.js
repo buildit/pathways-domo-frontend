@@ -15,7 +15,6 @@ import OEditGoals from "./components/organisms/o-editGoals";
 import OEditSkills from "./components/organisms/o-editSkills";
 import TribeVerListing from "./components/molecules/m-tribeVerListing";
 import authentication from './authentication';
-import store from './store';
 
 Vue.use(Router);
 

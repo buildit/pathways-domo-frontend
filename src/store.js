@@ -23,12 +23,6 @@ const store = new Vuex.Store({
         apiData: [],
         apiCallStatus: 200,
         domoTokenAttempts: 0,
-        // Temp for debug
-        fbroles: [],
-        fbusers: [],
-        fbskillGroups: [],
-        fbskillLevels: [],
-        fbskills: [],
     },
     getters: {
         qualifiedUsersBySkillGroup: state => {
@@ -160,6 +154,8 @@ const store = new Vuex.Store({
                         console.log("finished running fetchalldata");
                     });
                 }
+            }, rej => {
+                console.log(rej);
             }).catch(err => {
                 console.log(err);
             });
@@ -282,6 +278,7 @@ const store = new Vuex.Store({
 
             let skillGroupSkillSet = {};
 
+
             // break down rule set into roles
             data.forEach(function (r) {
                 if (rulesMap[r.roleTypeId] == null) {
@@ -304,23 +301,29 @@ const store = new Vuex.Store({
 
             });
 
+            let orderedRoles = state.roles.sort((a, b) => a.level - b.level);
+            let naLevel = orderedRoles.shift();
 
+            // map to user defined skills
             state.skillGroups.forEach(sg => {
-                userRoles[sg.id] = state.roles.find(r => r.level === 0);
-            });
+                userRoles[sg.id] = naLevel;
 
-            state.roles.forEach(r => {
+                let skillRules = rulesMap[sg.id];
 
-            });
+                orderedRoles.forEach(r => {
+                    let required = skillRules.rLevels[r.id];
 
-            state.skillGroups.forEach(sg => {
-                let mappedRoles = [];
-                if (!skillset.includes(s => s.skillTypeId === rm.skillTypeId)) {
-                    mappedRoles.push();
-                } else {
+                    let metRequirement = true;
+                    required.forEach(r => {
+                        if (!skillset.find(s => s.skillTypeId === r.type && s.skillLevelId === r.level)) {
+                            metRequirement = false;
+                        }
+                    });
 
-                }
-                userRoles[sg.id] = mappedRoles;
+                    if (metRequirement) {
+                        userRoles[sg.id] = r.id;
+                    }
+                });
             });
 
             store.commit('setSkillGroupSkills', skillGroupSkillSet);
@@ -356,8 +359,6 @@ const store = new Vuex.Store({
 
                 axios(config)
                     .then(response => {
-
-
                         if (response.status === 200) {
                             if (response.data.length > 0) {
                                 for (let i = 0; i < response.data.length; i++) {

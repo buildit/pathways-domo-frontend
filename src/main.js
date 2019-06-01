@@ -9,7 +9,7 @@ Vue.config.productionTip = false;
 
 // handle page reloads
 let app;
-authentication.initialize().then(user => {
+authentication.initialize().then((user) => {
   if (!app) {
     app = new Vue({
       el: '#app',
