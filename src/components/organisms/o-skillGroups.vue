@@ -4,9 +4,8 @@
       <div :id.prop="'sg_'+group.name" class="m-userDetail__skillGroup mb-6 p-4">
         <div class="d-flex justify-content-between">
           <h2>{{ group.name }}</h2>
-          <a-help-button v-bind:id="group.id.toString()" v-bind:type="'group'" @setHelpPanelContent="setHelpPanelContent"></a-help-button>
+          <a-help-button v-bind:id="group.id" v-bind:type="'group'" @setHelpPanelContent="setHelpPanelContent"></a-help-button>
         </div>
-
         <ul class="m-userDetail__roleStrip my-0 mb-4 p-0">
           <li v-if="userRoles[group.id]">
             <b>Current Level:</b> {{ userRoles[group.id].name }}
@@ -16,18 +15,15 @@
             Math.round(nextRoleLevels[group.id]['progressCompleted'] * 100) }}% Completed)
           </li>
         </ul>
-
         <ul class="m-userDetail__skillList m-0 p-0 d-flex flex-wrap">
           <template v-for="skill in skillGroupSkills[group.id].skills">
             <li class="col-6  d-flex px-2 mb-2">
-              <div :class="{'-isRequired': skill.required}" class="m-userDetail__skillListContent p-4 m-1 flex-grow-1 ">
+              <div class="m-userDetail__skillListContent p-4 m-1 flex-grow-1 ">
                 <div class="d-flex justify-content-between flex-grow-0">
-                  <p class="-requiredSkill">
-                    {{ skill.name }}
-                  </p>
+                  <p class="-requiredSkill">{{ skill.name }} </p>
                   <a-help-button v-bind:id="skill.id" v-bind:type="'skill'" @setHelpPanelContent="setHelpPanelContent"></a-help-button>
                 </div>
-                <o-skill-level__panel v-bind:group="group" v-bind:group_key="group.id.toString()" v-bind:skill="skill" v-bind:skill_key="skill.id"></o-skill-level__panel>
+                <o-skill-level__panel v-bind:group="group" v-bind:group_key="group.id" v-bind:skill="skill" v-bind:skill_key="skill.id"></o-skill-level__panel>
               </div>
             </li>
           </template>
@@ -36,7 +32,6 @@
     </template>
   </div>
 </template>
-
 <script>
     import {mapState} from 'vuex';
     import OSkillLevel__panel from "./o-skillLevel__panel";
@@ -86,7 +81,6 @@
         }
     };
 </script>
-
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 

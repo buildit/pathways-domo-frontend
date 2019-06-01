@@ -277,7 +277,6 @@ const store = new Vuex.Store({
 
         setUserRoles({commit, state}, data) {
             let skillset = state.userProfile.userSkills;
-            let rules = state.roleLevelRules;
             let userRoles = {};
             let rulesMap = {};
 

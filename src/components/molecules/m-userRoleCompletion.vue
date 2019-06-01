@@ -1,13 +1,13 @@
 <template>
-    <ul class="m-userRoleCompletion__list m-0 p-0">
-        <template v-for="item in listOfItems">
-            <li class="px-2 py-3 d-flex justify-content-between" v-if="item.progressCompleted > 0 || showEmpty === true">
-                <div class="m-userRoleCompletion__progressBar" v-bind:style="{width: (item.progressCompleted * 100) + '%'}"></div>
-                <span>{{ item.title }}</span>
-                <span>{{ item.role_name }}</span>
-            </li>
-        </template>
-    </ul>
+  <ul class="m-userRoleCompletion__list m-0 p-0">
+    <template v-for="item in listOfItems">
+      <li v-if="item.progressCompleted > 0 || showEmpty === true" class="px-2 py-3 d-flex justify-content-between">
+        <div class="m-userRoleCompletion__progressBar" v-bind:style="{width: (item.progressCompleted * 100) + '%'}"></div>
+        <span>{{ item.title }}</span>
+        <span>{{ item.role_name }}</span>
+      </li>
+    </template>
+  </ul>
 </template>
 
 <script>

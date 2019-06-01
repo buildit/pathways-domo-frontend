@@ -24,17 +24,14 @@
 
               <m-user-role-completion v-bind:listOfItems="userGoals" v-bind:showEmpty="true"></m-user-role-completion>
             </div>
-
             <TribeVerifications/>
           </div>
         </div>
 
         <div class=" col-12 col-lg-9">
-
           <o-edit-skills v-if="$route.params.id==='skills' && userRoles"
                          v-bind:nextRoleLevels="nextRoleLevels"
-                         @setHelpPanelContent="setHelpPanelContent"
-                         @setLoadingState="setLoadingState">
+                         @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState">
           </o-edit-skills>
 
           <o-edit-goals v-if="$route.params.id==='goals'" @setLoadingState="setLoadingState"></o-edit-goals>

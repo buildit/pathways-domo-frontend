@@ -1,14 +1,11 @@
 <template>
   <div class="d-flex justify-content-between m-0 p-0">
-    <button v-for="(thisLevel, index) in skillLevels" :style="'z-index:'+thisLevel[thisLevel.level]"
-            v-bind:class="{'-active': isActive[thisLevel.level],'-targetLevel': targetLevel[thisLevel.level]}"
-            @click.stop="setSkill(thisLevel)"
-    >
+    <button v-for="(thisLevel) in skillLevels" :style="'z-index:'+thisLevel.level"
+            v-bind:class="{'-active': isActive[thisLevel.level],'-targetLevel': targetLevel[thisLevel.level]}" @click.stop="setSkill(thisLevel)">
       {{ thisLevel.level }}
     </button>
   </div>
 </template>
-
 <script>
     import {mapState} from 'vuex';
 
@@ -16,9 +13,9 @@
         name: "o-skillLevel__panel",
         props: {
             group: Object,
-            group_key: String,
+            group_key: Number,
             skill: Object,
-            skill_key: String
+            skill_key: Number
         },
         data() {
             return {};
@@ -30,45 +27,38 @@
                 'skillGroups',
                 'skills',
                 'skillLevels',
-                'roles'
+                'roles',
+                'userRoles'
             ]),
             targetLevel: function () {
                 let newTargetStates = [];
 
-                for (let i = 0; i < this.roles.length; i++) {
+                for (let i = 0; i < this.skillLevels.length; i++) {
                     newTargetStates[i] = false;
-                }
+                } // set up the array for each button state
 
-                // determine user role level;
-                if (this.userProfile.roles == null) {
+                /*if (this.userRoles.find(ur => ur.[this.group_key]) {
+                    const thisCurrentLevel = parseInt(this.userRoles[this.group_key]['level']);
 
-                }
+                    if (thisCurrentLevel < this.roles.length - 1) {
+                        const nextLevel = thisCurrentLevel + 1;
+                        const nextRoleID = this.roles[nextLevel]['r_id'];
 
+                        const requiredNextLevel = this.skillGroups[this.group_key]['roles'][nextRoleID]['skills'][this.skill_key]['level'];
 
-                if (this.userProfile.roles[this.group_key]) {
-                }
-
-                const thisCurrentLevel = parseInt(this.userProfile.roles[this.group_key]['level']);
-
-                if (thisCurrentLevel < this.roles.length - 1) {
-                    const nextLevel = thisCurrentLevel + 1;
-                    const nextRoleID = this.roles[nextLevel]['r_id'];
-
-                    const requiredNextLevel = this.skillGroups[this.group_key]['roles'][nextRoleID]['skills'][this.skill_key]['level'];
-
-                    if (this.userProfile.skills[this.skill_key]) {
-                        if (this.userProfile.skills[this.skill_key].level < requiredNextLevel) {
+                        if (this.userProfile.userSkills[this.skill_key]) {
+                            if (this.userProfile.userSkills[this.skill_key].level < requiredNextLevel) {
+                                newTargetStates[requiredNextLevel] = true;
+                            } // if higher than ignore since it's not relevant for promotion
+                        } else {
                             newTargetStates[requiredNextLevel] = true;
-                        } // if higher than ignore since it's not relevant for promotion
-                    } else {
-                        newTargetStates[requiredNextLevel] = true;
-                    } // if user has existing level at this skill
-                }    // check if user isn't already mastered
+                        } // if user has existing level at this skill
+                    }    // check if user isn't already mastered
+                } // if role levels is set up
 
-                if (this.userProfile['skills'][this.skill_key]
-                ) {
-                    if (this.userProfile['skills'][this.skill_key]['level_goal']) {
-                        let level_goal = this.userProfile['skills'][this.skill_key]['level_goal']['level'];
+                if (this.userProfile.userSkills[this.skill_key]) {
+                    if (this.userProfile.userSkills[this.skill_key]['level_goal']) {
+                        let level_goal = this.userProfile.userSkills[this.skill_key]['level_goal']['level'];
 
                         for (let i = 0; i < this.skillLevels.length; i++) {
                             newTargetStates[i] = false;
@@ -78,25 +68,21 @@
                     }
 
                 } // user goal override
+*/
                 return newTargetStates;
             },
             isActive: function () {
                 let newActiveStates = [];
 
-                newActiveStates[0] = true;
-
-                for (let i = 1; i < this.skillLevels.length; i++) {
+                for (let i = 0; i < this.skillLevels.length; i++) {
                     newActiveStates[i] = false;
                 }
 
-                if (this.userProfile.userSkills[this.skill_key]) {
-                    for (let i = 0; i < this.skillLevels.length; i++) {
-                        newActiveStates[i] = false;
-                    }
-
-                    newActiveStates[this.userProfile.skills[this.skill_key].level] = true;
+                let userSkill = this.userProfile.userSkills.find(sk => sk.skillTypeId === this.skill_key);
+                if (userSkill) {
+                    newActiveStates[this.skillLevels.find(sl => sl.id === userSkill.skillLevelId).level] = true;
                 } else {
-
+                    newActiveStates[0] = true;
                 }
 
                 return newActiveStates;
@@ -122,10 +108,7 @@
             }
         }
     };
-
-
 </script>
-
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
@@ -198,6 +181,4 @@
       }
     }
   }
-
-
 </style>
