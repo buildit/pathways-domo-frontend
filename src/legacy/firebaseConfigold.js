@@ -17,8 +17,6 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const currentUser = auth.currentUser;
 
-
-
 // firebase collections
 const usersCollection = db.collection('users');
 const rolesCollection = db.collection('roles');

@@ -3,8 +3,6 @@ import Router from 'vue-router';
 import UserDetail from "./views/UserDetail";
 
 import Settings from "./views/Settings";
-import DBLinkage from "./dbSetup_reference/DBLinkage";
-import CSVParse from "./dbSetup_reference/CSVParse";
 import EditGroups from "./views/EditGroups";
 import Home from "./views/Home";
 import SkillsBreakdown from "./views/SkillsBreakdown";
@@ -57,19 +55,6 @@ const router = new Router({
                 requireAuth: true
             }
         },
-        /*{
-            path: '/debug',
-            name: 'Debug',
-            component: Debug,
-            meta: {
-                requireAuth: true
-            }
-        },
-        {
-            path: '/login',
-            name: 'Login',
-            component: Login
-        },*/
         {
             path: '/settings',
             name: 'Settings',
@@ -123,42 +108,15 @@ const router = new Router({
             meta: {
                 requireAuth: true
             }
-        },
-        {
-            path: '/db2',
-            name: 'DBLinkage',
-            component: DBLinkage,
-            meta: {
-                requireAuth: true
-            }
-        },
-        {
-            path: '/db',
-            name: 'CSVParse',
-            component: CSVParse,
-            meta: {
-                requireAuth: true
-            }
         }
-
     ]
 });
 
 router.beforeEach((to, from, next) => {
-    // const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
-    //const currentUser = firebase.auth().currentUser;
-
-    // if (requiresAuth && !currentUser) {
-    //   next('/login');
-    // } else if (requiresAuth && currentUser) {
-    //   next();
-    // } else {
-    //   next();
-    // }
 
     if (to.matched.some(record => record.meta.requireAuth)) {
         if (authentication.isAuthenticated()) {
-            // store.commit('setCurrentUser', authentication.getUser());
+            // TODO: look at this! store.commit('setCurrentUser', authentication.getUser());
             next();
         } else {
             authentication.signIn();

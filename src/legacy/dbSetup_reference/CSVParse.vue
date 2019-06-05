@@ -27,7 +27,7 @@
 </template>
 
 <script>
-    const fb = require('../services/firebaseConfig.js');
+    const fb = require('../../firebaseConfig.js');
 
     export default {
         name: "CSVParse",

@@ -228,11 +228,13 @@ const store = new Vuex.Store({
                     } // if hit the criteria
                 } // for roles
             }
-            fb.usersCollection.doc(state.currentUser.uid).set({
+            fb.usersCollection.doc(state.currentUser.uid)
+                .set({
                 roles: newRoleLevels
             }, {
                 merge: true
-            }).then(ref => {
+                })
+                .then(ref => {
                 store.dispatch('fetchUserProfile');
             }).catch(err => {
                 console.log(err);
