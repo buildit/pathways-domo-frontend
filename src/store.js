@@ -230,13 +230,13 @@ const store = new Vuex.Store({
             }
             fb.usersCollection.doc(state.currentUser.uid)
                 .set({
-                roles: newRoleLevels
-            }, {
-                merge: true
+                    roles: newRoleLevels
+                }, {
+                    merge: true
                 })
                 .then(ref => {
-                store.dispatch('fetchUserProfile');
-            }).catch(err => {
+                    store.dispatch('fetchUserProfile');
+                }).catch(err => {
                 console.log(err);
             });
         },
@@ -274,12 +274,12 @@ const store = new Vuex.Store({
         },
 
         setUserRoles({commit, state}, data) {
-            let skillset = state.userProfile.userSkills;
+            let userSkillSet = state.userProfile.userSkills;
             let userRoles = {};
             let rulesMap = {};
 
             let skillGroupSkillSet = {};
-
+            let skillLevels = state.skillLevels;
 
             // break down rule set into roles
             data.forEach(function (r) {
@@ -299,31 +299,53 @@ const store = new Vuex.Store({
 
                 skillGroupSkillSet[r.roleTypeId].skills.add(state.skills.find(s => s.id === r.skillTypeId));
 
-                rulesMap[r.roleTypeId].rLevels[r.roleLevelId].push({type: r.skillTypeId, level: r.skillLevelId});
+                rulesMap[r.roleTypeId].rLevels[r.roleLevelId].push({
+                    type: r.skillTypeId,
+                    level: skillLevels.find(s => s.id === r.skillLevelId)
+                });
 
             });
 
             let orderedRoles = state.roles.sort((a, b) => a.level - b.level);
             let naLevel = orderedRoles.shift();
 
-            // map to user defined skills
+            // look through each skill group
             state.skillGroups.forEach(sg => {
-                userRoles[sg.id] = naLevel;
 
+                // define user's role for this skill as n/a by default.
+                userRoles[sg.id] = {sg: sg, level: naLevel};
+
+                // get map of skills for this skill group
                 let skillRules = rulesMap[sg.id];
 
+                // look through each of the non-n/a role possibilities
                 orderedRoles.forEach(r => {
                     let required = skillRules.rLevels[r.id];
 
+                    // default to true, and let the list prove wrong
                     let metRequirement = true;
+
+                    // go through each required skill for this role level
                     required.forEach(r => {
-                        if (!skillset.find(s => s.skillTypeId === r.type && s.skillLevelId === r.level)) {
+                        // find the skill in the user's list if it exists
+                        let userSkill = userSkillSet.find(s => s.skillTypeId === r.type);
+
+                        if (userSkill && metRequirement) {
+                            // user skill exists, does the user meet or exceed the required level? If not, they do not get a promotion.
+                            let requiredLevel = r.level.level;
+                            let userLevel = skillLevels.find(s => s.id == userSkill.skillLevelId);
+                            if (userLevel.level >= requiredLevel) {
+                                metRequirement = true;
+                            } else {
+                                metRequirement = false;
+                            }
+                        } else {
                             metRequirement = false;
                         }
                     });
 
                     if (metRequirement) {
-                        userRoles[sg.id] = r.id;
+                        userRoles[sg.id] = {sg: sg, level: r};
                     }
                 });
             });
