@@ -1,75 +1,72 @@
-import AuthenticationContext from 'adal-angular/lib/adal.js';
+import * as Msal from 'msal';
 
-const config = {
-    clientId: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8', // pathways-ad-support
-    tenant: '1a6dbb80-5290-4fd1-a938-0ad7795dfd7a',
-    redirectUri: 'http://localhost:3110/',
-    cacheLocation: 'localStorage'
-};
+export default {}
 
-export default {
-    authenticationContext: null,
-    /**
-     * @return {Promise}
-     */
-    initialize() {
-        this.authenticationContext = new AuthenticationContext(config);
+export default class AuthService {
+    constructor() {
+        let PROD_REDIRECT_URI = 'https://pathways.buildit.systems/';
+        let redirectUri = window.location.origin;
+        /*        if (window.location.hostname !== '127.0.0.1') {
+                    redirectUri = PROD_REDIRECT_URI;
+                }*/
 
-        return new Promise((resolve, reject) => {
-            if (this.authenticationContext.isCallback(window.location.hash) || window.self !== window.top) {
-                // redirect to the location specified in the url params.
-                this.authenticationContext.handleWindowCallback();
-            } else {
-                // try pull the user out of local storage
-                let user = this.authenticationContext.getCachedUser();
-                if (user) {
-                    resolve();
-                } else {
-                    // no user at all - go sign in.
-                    this.signIn();
-                }
+        this.applicationConfig = {
+            clientID: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8', // pathways-ad-support
+            graphScopes: ['user.read']
+        };
+        this.app = new Msal.UserAgentApplication(
+            this.applicationConfig.clientID,
+            '',
+            () => {
+                // callback for login redirect
+            },
+            {
+                redirectUri
             }
-        });
-    },
+        );
+    };
 
-    acquireToken() {
-        return new Promise((resolve, reject) => {
-            this.authenticationContext.acquireToken('<azure active directory resource id>', (error, token) => {
-                if (error || !token) {
-                    return reject(error);
-                } else {
-                    return resolve(token);
-                }
-            });
-        });
-    },
-
-    acquireTokenRedirect() {
-        this.authenticationContext.acquireTokenRedirect('<azure active directory resource id>');
-    },
-    getCachedToken() {
-        return this.authenticationContext.getCachedToken(config.clientId);
-    },
-    isAuthenticated() {
-        // getCachedToken will only return a valid, non-expired token.
-        if (this.authenticationContext.getCachedToken(config.clientId)) {
-            return true;
-        }
-        return false;
-    },
-    /**
-     * @return An ADAL user profile object.
-     */
-    getUserProfile() {
-        return this.authenticationContext.getCachedUser().profile;
-    },
-    getUser() {
-        return this.authenticationContext.getCachedUser();
-    },
-    signIn() {
-        this.authenticationContext.login();
-    },
-    signOut() {
-        this.authenticationContext.logOut();
+    loginRedir() {
+        return this.app.loginRedirect(this.applicationConfig.graphScopes);
     }
-};
+
+    login() {
+        return this.app.loginPopup(this.applicationConfig.graphScopes).then(
+            idToken => {
+                const user = this.app.getUser();
+                if (user) {
+                    return user;
+                } else {
+                    return null;
+                }
+            },
+            () => {
+                return null;
+            }
+        );
+    };
+
+    logout() {
+        this.app.logout();
+    };
+
+    getToken() {
+        return this.app.acquireTokenSilent(this.applicationConfig.graphScopes).then(
+            accessToken => {
+                return accessToken;
+            },
+            error => {
+                return this.app
+                    .acquireTokenPopup(this.applicationConfig.graphScopes)
+                    .then(
+                        accessToken => {
+                            return accessToken;
+                        },
+                        err => {
+                            console.error(err);
+                        }
+                    );
+            }
+        );
+    };
+}
