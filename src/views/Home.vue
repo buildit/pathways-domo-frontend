@@ -79,20 +79,11 @@
 <script>
     import BenchWidget from "../components/molecules/m-benchWidget";
     import {mapState} from "vuex";
-    import authentication from "../authentication";
     import store from '../store';
-
-    const auth = authentication.authenticationContext;
 
     const currentUser = function () {
         return store.state.currentUser;
     };
-
-    authentication.initialize().then((u) => {
-        store.commit('setCurrentUser', authentication.getUserProfile());
-        store.dispatch('fetchUserProfile');
-    });
-
     export default {
         components: {BenchWidget},
         data() {
@@ -113,20 +104,20 @@
     };
 </script>
 <style scoped lang="scss">
-    @import "@/styles/main.scss";
+  @import "@/styles/main.scss";
 
-    .linkSection__wrapper {
-        @each $key, $color in $colorVisualization {
-            &:nth-child(#{$key}n) {
-                .linkSection {
-                    @include deepShadow(16, $color, 20%);
-                    margin-bottom: space(4);
-                    padding: space(4);
+  .linkSection__wrapper {
+    @each $key, $color in $colorVisualization {
+      &:nth-child(#{$key}n) {
+        .linkSection {
+          @include deepShadow(16, $color, 20%);
+          margin-bottom: space(4);
+          padding: space(4);
 
-                }
-
-
-            }
         }
+
+
+      }
     }
+  }
 </style>

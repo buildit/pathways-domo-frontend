@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import UserDetail from "./views/UserDetail";
-
 import Settings from "./views/Settings";
 import EditGroups from "./views/EditGroups";
 import Home from "./views/Home";
@@ -12,7 +11,6 @@ import Assessments from './views/Assessments';
 import OEditGoals from "./components/organisms/o-editGoals";
 import OEditSkills from "./components/organisms/o-editSkills";
 import TribeVerListing from "./components/molecules/m-tribeVerListing";
-import authentication from './authentication';
 
 Vue.use(Router);
 
@@ -113,13 +111,13 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-
     if (to.matched.some(record => record.meta.requireAuth)) {
-        if (authentication.isAuthenticated()) {
-            // TODO: look at this! store.commit('setCurrentUser', authentication.getUser());
+
+
+        if (liveToken) {
             next();
         } else {
-            authentication.signIn();
+            authService.loginRedir();
         }
     } else {
         next();
