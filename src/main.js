@@ -11,9 +11,7 @@ Vue.config.productionTip = false;
 let app;
 let authService = new MSALAuthService();
 
-authService.login().then((result) => {
-  console.log(result);
-  store.commit('setCurrentUser', result.getAccount());
+authService.oldLogin().then((result) => {
   if (!app) {
     app = new Vue({
       el: '#app',

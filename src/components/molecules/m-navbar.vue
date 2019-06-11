@@ -58,9 +58,10 @@
   </div>
 </template>
 <script>
-    import {mapState} from 'vuex';
+  import {mapState} from 'vuex';
+  import MSALAuthService from '../../authentication';
 
-    export default {
+  export default {
         name: "MNavbar",
         props: {
             isNavOpen: Boolean
@@ -79,13 +80,8 @@
             },
             logout: function () {
                 this.checkToClosePanel();
-                $adal.signOut();
-                fb.auth.signOut().then(() => {
-                    this.$store.dispatch('clearData');
-                    this.$router.push('/login');
-                }).catch(err => {
-                    console.log(err);
-                });
+              let authService = new MSALAuthService();
+              authService.logOut();
             }
         }
     };

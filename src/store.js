@@ -7,6 +7,9 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
+        msalAccount: null,
+        idToken: null,
+        graphToken: null,
         currentUser: null,
         userProfile: {},
         userRoles: null,
@@ -138,7 +141,7 @@ const store = new Vuex.Store({
             commit('setSkillGroups', null);
         },
         fetchUserProfile({commit, state}) {
-            api.User.get(state.currentUser.email).then(res => {
+            api.User.get(state.currentUser.mail).then(res => {
 
                 console.log('committing ' + res.data.username);
                 if (res.data.directoryName == null) {
@@ -451,6 +454,12 @@ const store = new Vuex.Store({
     mutations: {
         setCurrentUser(state, val) {
             state.currentUser = val;
+        },
+        setIdToken(state, val) {
+            state.idToken = val;
+        },
+        setGraphToken(state, val) {
+            state.graphToken = val;
         },
         setUserProfile(state, val) {
             state.userProfile = val;

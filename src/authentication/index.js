@@ -5,16 +5,27 @@ import store from '../store';
 export default class MSALAuthService {
     constructor() {
         // let redirectUri = window.location.origin;
+        this.msalAuthority = 'https://login.microsoftonline.com/1a6dbb80-5290-4fd1-a938-0ad7795dfd7a';
         this.loggedInUser = {idToken: "", adName: "", organizationId: "", username: "", graphToken: ""};
         let msalConfig = {
             auth: {
-                clientId: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8'
+                clientId: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8',
+                tenantId: '1a6dbb80-5290-4fd1-a938-0ad7795dfd7a',
+                authority: this.msalAuthority
             }
         };
 
         this.graphEndpoint = "https://graph.microsoft.com/v1.0/me";
         this.msalInstance = new Msal.UserAgentApplication(msalConfig);
         this.scopes = {scopes: ['user.read']};
+        /*his.msalInstance.handleRedirectCallback((error, response) => {
+            if (error) {
+                console.log(error);
+            } else {
+                this.getGraphToken();
+            }
+            console.log(response);
+        });*/
     };
 
     getAccount() {
@@ -22,15 +33,83 @@ export default class MSALAuthService {
     }
 
     login() {
-        return new Promise((resolve, reject) => {
-            this.setupAuth()
-                .then(
-                    (r) => this.requestGraphToken(r)
-                    .then(
-                        (r) => this.makeGraphCall(r).then( res => resolve(res))
-                    ));
-        });
+        this.msalInstance.loginRedirect(this.scopes);
     }
+
+    logOut() {
+        this.msalInstance.logout();
+    }
+
+    oldLogin() {
+        let dScopes = this.scopes;
+        let mi = this.msalInstance;
+
+        return new Promise((resolve, reject) => {
+                if (!mi.getAccount()) {
+                    this.setupAuth2().then((r) => {
+                        store.commit("setIdToken", r);
+                    }).then((r) => {
+                        let token = mi.acquireTokenSilent(dScopes);
+                        this.makeGraphCall(token.accessToken).then(result => {
+                            store.commit('setCurrentUser', result.data);
+                            store.dispatch('fetchUserProfile');
+                        });
+                        // this.requestGraphToken();
+                    }).then(r => resolve());
+                } else {
+                    let token = mi.acquireTokenSilent(dScopes);
+                    this.makeGraphCall(token.accessToken).then(result => {
+                        store.commit('setCurrentUser', result.data);
+                        store.dispatch('fetchUserProfile');
+                        resolve();
+                    });
+                }
+            }
+        );
+    }
+
+    /*requestGraphToken() {
+
+            .then(res => {
+                this.makeGraphCall(res.accessToken).then(result => {
+                    store.commit('setCurrentUser', result.data);
+                    store.dispatch('fetchUserProfile');
+                });
+            }).catch(err => {
+            if (err.name === "InteractionRequiredAuthError") {
+                this.msalInstance.acquireTokenPopup(this.scopes)
+                    .then(response => {
+                        r.graphToken = response.accessToken;
+                        resolve(r);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        reject();
+                    });
+            }
+        });
+    }*/
+
+    /*}).then((r) => {
+        this.makeGraphCall(r.accessToken).then(r => {
+            store.commit('setCurrentUser', result.data);
+            store.dispatch('fetchUserProfile');
+            resolve();
+        });
+    });*/
+    goGraph() {
+        this.requestGraphToken();
+    }
+
+    setupAuth2() {
+        return this.msalInstance.loginPopup(this.scopes);
+    }
+
+
+    requestGraphToken2() {
+        return this.msalInstance.acquireTokenSilent(this.scopes);
+    }
+
 
     setupAuth() {
         let account = this.getAccount();
@@ -48,45 +127,40 @@ export default class MSALAuthService {
                         reject();
                     });
             } else {
+                user.idToken = sessionStorage.getItem('msal.idtoken');
+                user.adName = account.name;
+                user.organizationId = account.userName;
                 resolve(user);
             }
         });
-    };
+    }
+    ;
 
-    requestGraphToken(r) {
-        this.loggedInUser = r;
 
-        return new Promise((resolve, reject) => {
-            this.msalInstance.acquireTokenSilent(this.scopes)
-                .then(res => {
-                    r.graphToken = res.accessToken;
-                    resolve(r);
-                }).catch(err => {
-                if (err.name === "InteractionRequiredAuthError") {
-                    this.msalInstance.acquireTokenPopup(this.scopes)
-                        .then(response => {
-                            r.graphToken = response.accessToken;
-                            resolve(r);
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            reject();
-                        });
-                }
+    getGraphToken() {
+        this.msalInstance.acquireTokenSilent(this.scopes)
+            .then(tokenResponse => {
+                console.log('tokenResponse', tokenResponse.accessToken);
+                this.makeGraphCall(tokenResponse.accessToken);
+            })
+            .catch(err => {
+                console.log('err', err);
             });
-        });
+    }
+
+
+    acquireTokenSilently() {
+        return this.msalInstance.acquireTokenSilent(this.scopes);
     }
 
     makeGraphCall(r) {
-        return new Promise((resolve, reject) => {
-            let getHeader = function () {
-                return {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${r.graphToken}`
-                };
+        let getHeader = function () {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${r}`
             };
+        };
 
-            return axios.get(this.graphEndpoint, {headers: getHeader()}).then(res => resolve(res));
-        });
+        return axios.get(this.graphEndpoint, {headers: getHeader()});
     }
 }

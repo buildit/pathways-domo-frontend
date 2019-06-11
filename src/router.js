@@ -11,6 +11,8 @@ import Assessments from './views/Assessments';
 import OEditGoals from "./components/organisms/o-editGoals";
 import OEditSkills from "./components/organisms/o-editSkills";
 import TribeVerListing from "./components/molecules/m-tribeVerListing";
+import MSALAuthService from './authentication';
+
 
 Vue.use(Router);
 
@@ -110,14 +112,15 @@ const router = new Router({
     ]
 });
 
+let authService = new MSALAuthService();
+
+
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireAuth)) {
-
-
-        if (liveToken) {
+        if (sessionStorage.getItem('msal.idtoken')) {
             next();
         } else {
-            authService.loginRedir();
+            authService.acquireTokenSilently();
         }
     } else {
         next();

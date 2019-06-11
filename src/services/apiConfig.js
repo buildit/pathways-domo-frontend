@@ -1,5 +1,4 @@
 import axios from 'axios';
-import authentication from '../authentication';
 
 const config = {
     baseUrl: 'http://localhost:5000/api',
@@ -14,7 +13,7 @@ const config = {
 };
 
 let getHeader = function () {
-    let token = authentication.getCachedToken();
+    let token = sessionStorage.getItem('msal.idtoken');
     return {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
