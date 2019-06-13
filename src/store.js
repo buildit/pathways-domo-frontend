@@ -144,7 +144,6 @@ const store = new Vuex.Store({
         fetchUserProfile({commit, state}) {
             let api1 = new Api();
             api1.initialize().then((api) => {
-
                 api.User().get(state.currentUser.mail).then(res => {
 
                     console.log('committing ' + res.data.username);
@@ -239,35 +238,38 @@ const store = new Vuex.Store({
         },
 
         fetchAllData({commit, state}, user) {
-            const usersRequest = api.User().getAll().then(res => {
-                store.commit('setUsers', res.data);
-            });
-
-            const rolesRequest = api.Role().getAll().then(res => {
-                store.commit('setRoles', res.data);
-            });
-
-            const skillGroupRequest = api.Role().getAllTypes().then(res => {
-                store.commit('setSkillGroups', res.data);
-            });
-
-            const skillsRequest = api.Skill().getAll().then(res => {
-                store.commit('setSkills', res.data);
-            });
-
-            const skillLevelsRequest = api.Skill().getAllLevels().then(res => {
-                store.commit('setSkillLevels', res.data);
-            });
-
-            const rulesRequest = api.RoleLevelRule().getAll().then(res => {
-                store.commit('setRoleLevelRules', res.data);
-                store.dispatch('setUserRoles', res.data);
-            });
-
-            Promise.all([usersRequest, rolesRequest, skillGroupRequest, skillsRequest, skillLevelsRequest])
-                .then(() => {
-                    return rulesRequest;
+            let api1 = new Api();
+            api1.initialize().then(api => {
+                const usersRequest = api.User().getAll().then(res => {
+                    store.commit('setUsers', res.data);
                 });
+
+                const rolesRequest = api.Role().getAll().then(res => {
+                    store.commit('setRoles', res.data);
+                });
+
+                const skillGroupRequest = api.Role().getAllTypes().then(res => {
+                    store.commit('setSkillGroups', res.data);
+                });
+
+                const skillsRequest = api.Skill().getAll().then(res => {
+                    store.commit('setSkills', res.data);
+                });
+
+                const skillLevelsRequest = api.Skill().getAllLevels().then(res => {
+                    store.commit('setSkillLevels', res.data);
+                });
+
+                const rulesRequest = api.RoleLevelRule().getAll().then(res => {
+                    store.commit('setRoleLevelRules', res.data);
+                    store.dispatch('setUserRoles', res.data);
+                });
+
+                Promise.all([usersRequest, rolesRequest, skillGroupRequest, skillsRequest, skillLevelsRequest])
+                    .then(() => {
+                        return rulesRequest;
+                    });
+            });
         },
 
         setUserRoles({commit, state}, data) {

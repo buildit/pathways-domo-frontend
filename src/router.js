@@ -129,6 +129,7 @@ router.beforeEach((to, from, next) => {
                 })
                 .catch(err => {
                     console.log(`error making graph call ${err}`);
+                    mService.logOut();
                     mService.login();
                 });
         } else {

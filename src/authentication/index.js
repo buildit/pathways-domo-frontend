@@ -5,7 +5,7 @@ import store from '../store';
 export default class MSALAuthService {
     constructor() {
         // let redirectUri = window.location.origin;
-        this.msalAuthority = 'https://login.microsoftonline.com/1a6dbb80-5290-4fd1-a938-0ad7795dfd7a';
+        this.msalAuthority = 'https://login.microsoftonline.com/organizations';
 
         let msalConfig = {
             auth: {
@@ -32,8 +32,8 @@ export default class MSALAuthService {
 
         this.msalInstance = store.state.msalAgent;
 
-        // this.scopes = {scopes: ['https://graph.microsoft.com/user.read']};
         this.scopes = {scopes: ['https://graph.microsoft.com/user.read']};
+        //this.scopes = {scopes: ['https://graph.microsoft.com/user.read']};
         this.msalInstance.handleRedirectCallback((error, response) => {
             if (error) {
                 console.log(error);

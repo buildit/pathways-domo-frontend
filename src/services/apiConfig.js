@@ -10,8 +10,7 @@ const config = {
     skillTypeEndpoint: '/skill/types',
     skillTypeLevelEndpoint: '/skill/typelevel',
     roleLevelRuleEndpoint: '/rolelevelrule',
-    userSkillEndpoint: '/userskill',
-    rsaBase: new RsaAUeue
+    userSkillEndpoint: '/userskill'
 };
 
 class ApiBase {
@@ -180,7 +179,7 @@ export default class Api {
         let instance = this;
         return new Promise((res, rej) => {
             this.authService.getOrAcquireSilently().then(result => {
-                instance.setToken(result.accessToken);
+                instance.setToken(result.idToken.rawIdToken);
                 res(instance);
             });
         });
