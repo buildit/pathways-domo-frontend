@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
-import api from './services/apiConfig';
+import Api from './services/apiConfig';
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
         msalAccount: null,
+        msalAgent: null,
         idToken: null,
         graphToken: null,
         currentUser: null,
@@ -141,31 +142,35 @@ const store = new Vuex.Store({
             commit('setSkillGroups', null);
         },
         fetchUserProfile({commit, state}) {
-            api.User.get(state.currentUser.mail).then(res => {
+            let api1 = new Api();
+            api1.initialize().then((api) => {
 
-                console.log('committing ' + res.data.username);
-                if (res.data.directoryName == null) {
-                    res.data.directoryName = state.currentUser.name;
-                    res.data.name = state.currentUser.name.replace(' (Digital)', '');
-                    store.dispatch('updateProfile', res.data);
-                }
+                api.User().get(state.currentUser.mail).then(res => {
 
-                commit('setUserProfile', res.data);
+                    console.log('committing ' + res.data.username);
+                    if (res.data.directoryName == null) {
+                        res.data.directoryName = state.currentUser.name;
+                        res.data.name = state.currentUser.name.replace(' (Digital)', '');
+                        store.dispatch('updateProfile', res.data);
+                    }
 
-                if (res.data != null) {
-                    store.dispatch('fetchAllData', res).then(res => {
-                        console.log("finished running fetchalldata");
-                    });
-                }
-            }, rej => {
-                console.log(rej);
-            }).catch(err => {
-                console.log(err);
+                    commit('setUserProfile', res.data);
+
+                    if (res.data != null) {
+                        store.dispatch('fetchAllData', res).then(res => {
+                            console.log("finished running fetchalldata");
+                        });
+                    }
+                }, rej => {
+                    console.log(rej);
+                }).catch(err => {
+                    console.log(err);
+                });
+                return null;
             });
-            return null;
         },
         updateProfile({commit, state}, data) {
-            api.User.update(data).then(user => {
+            api.User().update(data).then(user => {
                 console.log('User profile updated.');
             }).catch(err => {
                 console.log(err);
@@ -234,27 +239,27 @@ const store = new Vuex.Store({
         },
 
         fetchAllData({commit, state}, user) {
-            const usersRequest = api.User.getAll().then(res => {
+            const usersRequest = api.User().getAll().then(res => {
                 store.commit('setUsers', res.data);
             });
 
-            const rolesRequest = api.Role.getAll().then(res => {
+            const rolesRequest = api.Role().getAll().then(res => {
                 store.commit('setRoles', res.data);
             });
 
-            const skillGroupRequest = api.Role.getAllTypes().then(res => {
+            const skillGroupRequest = api.Role().getAllTypes().then(res => {
                 store.commit('setSkillGroups', res.data);
             });
 
-            const skillsRequest = api.Skill.getAll().then(res => {
+            const skillsRequest = api.Skill().getAll().then(res => {
                 store.commit('setSkills', res.data);
             });
 
-            const skillLevelsRequest = api.Skill.getAllLevels().then(res => {
+            const skillLevelsRequest = api.Skill().getAllLevels().then(res => {
                 store.commit('setSkillLevels', res.data);
             });
 
-            const rulesRequest = api.RoleLevelRule.getAll().then(res => {
+            const rulesRequest = api.RoleLevelRule().getAll().then(res => {
                 store.commit('setRoleLevelRules', res.data);
                 store.dispatch('setUserRoles', res.data);
             });
@@ -560,6 +565,13 @@ const store = new Vuex.Store({
                 state.roleLevelRules = val;
             } else {
                 state.roleLevelRules = [];
+            }
+        },
+        setMsalAgent(state, val) {
+            if (val) {
+                state.msalAgent = val;
+            } else {
+                state.msalAgent = null;
             }
         },
         setSkillGroupSkills(state, val) {

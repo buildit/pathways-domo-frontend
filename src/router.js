@@ -12,7 +12,7 @@ import OEditGoals from "./components/organisms/o-editGoals";
 import OEditSkills from "./components/organisms/o-editSkills";
 import TribeVerListing from "./components/molecules/m-tribeVerListing";
 import MSALAuthService from './authentication';
-
+import store from "./store";
 
 Vue.use(Router);
 
@@ -112,15 +112,28 @@ const router = new Router({
     ]
 });
 
-let authService = new MSALAuthService();
-
-
+let mService = new MSALAuthService();
+let myStore = store;
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireAuth)) {
-        if (sessionStorage.getItem('msal.idtoken')) {
+
+        if (myStore.state.currentUser) {
+            console.log(`have current user: ${store.state.currentUser}`);
             next();
+        } else if (mService.getAccount()) {
+            console.log(`have account but no user: ${mService.getAccount()}`);
+            mService.goGraph().then((result) => {
+                    myStore.commit('setCurrentUser', result.data);
+                    myStore.dispatch('fetchUserProfile');
+                    next();
+                })
+                .catch(err => {
+                    console.log(`error making graph call ${err}`);
+                    mService.login();
+                });
         } else {
-            authService.acquireTokenSilently();
+            console.log(`complete failure`);
+            console.log('not authorized.');
         }
     } else {
         next();

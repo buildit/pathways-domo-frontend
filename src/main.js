@@ -11,14 +11,16 @@ Vue.config.productionTip = false;
 let app;
 let authService = new MSALAuthService();
 
-authService.oldLogin().then((result) => {
-  if (!app) {
-    app = new Vue({
-      el: '#app',
-      router,
-      store,
-      render: h => h(App)
-    });
-  }
-});
-
+if (authService.getAccount()) {
+    if (!app) {
+        app = new Vue({
+            el: '#app',
+            router,
+            store,
+            render: h => h(App)
+        });
+    }
+}
+else{
+    authService.login();
+}
