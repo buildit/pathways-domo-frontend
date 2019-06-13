@@ -39,7 +39,7 @@ class UserApi extends ApiBase {
     getAll() {
         let endpoint = config.baseUrl + config.userEndpoint;
         return axios.get(endpoint, {headers: this.getHeader()});
-    }ss
+    }
 
     update(userData) {
         let endpoint = `${config.baseUrl + config.userEndpoint}/${userData.username}`;
@@ -179,7 +179,8 @@ export default class Api {
         let instance = this;
         return new Promise((res, rej) => {
             this.authService.getOrAcquireSilently().then(result => {
-                instance.setToken(result.idToken.rawIdToken);
+                if (result.idToken.expiration < Date.now())
+                    instance.setToken(result.idToken.rawIdToken);
                 res(instance);
             });
         });
