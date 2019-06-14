@@ -1,10 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import UserDetail from "./views/UserDetail";
-
 import Settings from "./views/Settings";
-import DBLinkage from "./dbSetup_reference/DBLinkage";
-import CSVParse from "./dbSetup_reference/CSVParse";
 import EditGroups from "./views/EditGroups";
 import Home from "./views/Home";
 import SkillsBreakdown from "./views/SkillsBreakdown";
@@ -14,8 +11,8 @@ import Assessments from './views/Assessments';
 import OEditGoals from "./components/organisms/o-editGoals";
 import OEditSkills from "./components/organisms/o-editSkills";
 import TribeVerListing from "./components/molecules/m-tribeVerListing";
-import authentication from './authentication';
-import store from './store';
+import MSALAuthService from './authentication';
+import store from "./store";
 
 Vue.use(Router);
 
@@ -58,19 +55,6 @@ const router = new Router({
                 requireAuth: true
             }
         },
-        /*{
-            path: '/debug',
-            name: 'Debug',
-            component: Debug,
-            meta: {
-                requireAuth: true
-            }
-        },
-        {
-            path: '/login',
-            name: 'Login',
-            component: Login
-        },*/
         {
             path: '/settings',
             name: 'Settings',
@@ -124,45 +108,33 @@ const router = new Router({
             meta: {
                 requireAuth: true
             }
-        },
-        {
-            path: '/db2',
-            name: 'DBLinkage',
-            component: DBLinkage,
-            meta: {
-                requireAuth: true
-            }
-        },
-        {
-            path: '/db',
-            name: 'CSVParse',
-            component: CSVParse,
-            meta: {
-                requireAuth: true
-            }
         }
-
     ]
 });
 
+let mService = new MSALAuthService();
+let myStore = store;
 router.beforeEach((to, from, next) => {
-    // const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
-    //const currentUser = firebase.auth().currentUser;
-
-    // if (requiresAuth && !currentUser) {
-    //   next('/login');
-    // } else if (requiresAuth && currentUser) {
-    //   next();
-    // } else {
-    //   next();
-    // }
-
     if (to.matched.some(record => record.meta.requireAuth)) {
-        if (authentication.isAuthenticated()) {
-            // store.commit('setCurrentUser', authentication.getUser());
+
+        if (myStore.state.currentUser) {
+            console.log(`have current user: ${store.state.currentUser}`);
             next();
+        } else if (mService.getAccount()) {
+            console.log(`have account but no user: ${mService.getAccount()}`);
+            mService.goGraph().then((result) => {
+                    myStore.commit('setCurrentUser', result.data);
+                    myStore.dispatch('fetchUserProfile');
+                    next();
+                })
+                .catch(err => {
+                    console.log(`error making graph call ${err}`);
+                    mService.logOut();
+                    mService.login();
+                });
         } else {
-            authentication.signIn();
+            console.log(`complete failure`);
+            console.log('not authorized.');
         }
     } else {
         next();

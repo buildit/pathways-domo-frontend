@@ -1,15 +1,14 @@
 <template>
-    <div>
-        <h3>Primary Tribes</h3>
-
-        <ul class="m-0 p-0">
-            <template v-for="role in userProfile.roles">
-                <li v-if="role.level > 0">
-                    {{ role.level_name }} {{ role.title }}
-                </li>
-            </template>
-        </ul>
-    </div>
+  <div>
+    <h3>Primary Tribes</h3>
+    <ul class="m-0 p-0">
+      <template v-for="role in userProfile.roles">
+        <li v-if="role.level > 0">
+          {{ role.level_name }} {{ role.title }}
+        </li>
+      </template>
+    </ul>
+  </div>
 </template>
 
 <script>

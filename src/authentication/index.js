@@ -1,75 +1,106 @@
-import AuthenticationContext from 'adal-angular/lib/adal.js';
+import * as Msal from 'msal';
+import axios from 'axios';
+import store from '../store';
 
-const config = {
-    clientId: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8', // pathways-ad-support
-    tenant: '1a6dbb80-5290-4fd1-a938-0ad7795dfd7a',
-    redirectUri: 'http://localhost:3110/',
-    cacheLocation: 'localStorage'
-};
+export default class MSALAuthService {
+    constructor() {
+        // let redirectUri = window.location.origin;
+        this.msalAuthority = 'https://login.microsoftonline.com/organizations';
 
-export default {
-    authenticationContext: null,
-    /**
-     * @return {Promise}
-     */
-    initialize() {
-        this.authenticationContext = new AuthenticationContext(config);
+        let msalConfig = {
+            auth: {
+                authority: this.msalAuthority,
+                clientId: 'fd8a25a4-d4ae-4ec9-96e7-bec62ae45ca8',
+                redirectUrl: "http://localhost:3110",
+
+            },
+            system: {
+                logger: new Msal.Logger(this.log, {
+                    level: Msal.LogLevel.Verbose,
+                    piiLoggingEnabled: true,
+                    correlationId: "wokays"
+                }),
+
+            }
+        };
+        this.graphEndpoint = "https://graph.microsoft.com/v1.0/me";
+
+        if (!store.state.msalAgent) {
+            let inst = new Msal.UserAgentApplication(msalConfig);
+            store.commit('setMsalAgent', inst);
+        }
+
+        this.msalInstance = store.state.msalAgent;
+
+        this.scopes = {scopes: ['https://graph.microsoft.com/user.read']};
+        //this.scopes = {scopes: ['https://graph.microsoft.com/user.read']};
+        this.msalInstance.handleRedirectCallback((error, response) => {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log(response);
+            }
+
+        });
+    };
+
+    log(level, message, p2) {
+        console.log(`${level}-${p2}: ${message}`);
+    }
+
+    getAccount() {
+        return this.msalInstance.getAccount();
+    }
+
+    login() {
+        this.msalInstance.loginRedirect(this.scopes);
+    }
+
+    logOut() {
+        this.msalInstance.logout();
+    }
+
+    oldLogin() {
+        let mi = this.msalInstance;
 
         return new Promise((resolve, reject) => {
-            if (this.authenticationContext.isCallback(window.location.hash) || window.self !== window.top) {
-                // redirect to the location specified in the url params.
-                this.authenticationContext.handleWindowCallback();
-            } else {
-                // try pull the user out of local storage
-                let user = this.authenticationContext.getCachedUser();
-                if (user) {
-                    resolve();
+                if (!mi.getAccount()) {
+                    this.setupAuth2().then((r) => {
+                        store.commit("setIdToken", r);
+                        resolve();
+                    });
                 } else {
-                    // no user at all - go sign in.
-                    this.signIn();
+                    resolve();
                 }
             }
-        });
-    },
-
-    acquireToken() {
-        return new Promise((resolve, reject) => {
-            this.authenticationContext.acquireToken('<azure active directory resource id>', (error, token) => {
-                if (error || !token) {
-                    return reject(error);
-                } else {
-                    return resolve(token);
-                }
-            });
-        });
-    },
-
-    acquireTokenRedirect() {
-        this.authenticationContext.acquireTokenRedirect('<azure active directory resource id>');
-    },
-    getCachedToken() {
-        return this.authenticationContext.getCachedToken(config.clientId);
-    },
-    isAuthenticated() {
-        // getCachedToken will only return a valid, non-expired token.
-        if (this.authenticationContext.getCachedToken(config.clientId)) {
-            return true;
-        }
-        return false;
-    },
-    /**
-     * @return An ADAL user profile object.
-     */
-    getUserProfile() {
-        return this.authenticationContext.getCachedUser().profile;
-    },
-    getUser() {
-        return this.authenticationContext.getCachedUser();
-    },
-    signIn() {
-        this.authenticationContext.login();
-    },
-    signOut() {
-        this.authenticationContext.logOut();
+        );
     }
-};
+
+    async getOrAcquireSilently() {
+        console.log('start waiting');
+        this.acquiring = true;
+        let x = await this.msalInstance.acquireTokenSilent(this.scopes);
+        return x;
+    }
+
+    async goGraph() {
+        let token = await this.msalInstance.acquireTokenSilent(this.scopes);
+
+        return this.makeGraphCall(token.accessToken);
+    }
+
+    makeGraphCall(r) {
+        let getHeader = function () {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${r}`
+            };
+        };
+
+        return axios.get(this.graphEndpoint, {headers: getHeader()});
+    }
+
+    setupAuth2() {
+        return this.msalInstance.loginPopup(this.scopes);
+    }
+}

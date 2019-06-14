@@ -52,7 +52,7 @@
 <script>
   import { mapState } from 'vuex';
 
-  const fb = require('../services/firebaseConfig.js');
+  // const fb = require('../services/firebaseConfig.js');
 
   export default {
     components: {},

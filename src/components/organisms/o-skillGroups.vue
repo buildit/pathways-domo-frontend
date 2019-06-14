@@ -12,7 +12,7 @@
           </li>
           <li v-if="nextRoleLevels[group.id]">
             <b>Up Next:</b> {{ nextRoleLevels[group.id]['role_name'] }} ({{
-            Math.round(nextRoleLevels[group.id]['progressCompleted'] * 100) }}% Completed)
+              Math.round(nextRoleLevels[group.id]['progressCompleted'] * 100) }}% Completed)
           </li>
         </ul>
         <ul class="m-userDetail__skillList m-0 p-0 d-flex flex-wrap">
@@ -32,6 +32,7 @@
     </template>
   </div>
 </template>
+
 <script>
     import {mapState} from 'vuex';
     import OSkillLevel__panel from "./o-skillLevel__panel";

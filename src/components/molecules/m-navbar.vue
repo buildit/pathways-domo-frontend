@@ -1,66 +1,67 @@
 <template>
-    <div class="m-navbar__container  ">
-        <div v-if="!isNavOpen">
-            <button class="m-navbar__openPanelButton" @click.prevent="setNavPanelState(true)">
-                Menu
-            </button>
-        </div>
-        <div v-else class="m-navbar__listWrapper ">
-            <ul class="p-0 m-0">
-                <li>
-                    <router-link to="/dashboard" @click.native="checkToClosePanel">
-                        Home
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/user/skills" @click.native="checkToClosePanel">
-                        Self-Assessment
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/user/goals" @click.native="checkToClosePanel">
-                        Set Goals
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/user/tribeverification" @click.native="checkToClosePanel">
-                        Tribe Verification
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/skillsbreakdown" @click.native="checkToClosePanel">
-                        Expertise Lookup
-                    </router-link>
-                </li>
-                <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
-                    <router-link to="/editgroups" @click.native="checkToClosePanel">
-                        Edit Groups
-                    </router-link>
-                </li>
-                <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
-                    <router-link to="/debug" @click.native="checkToClosePanel">
-                        Debug
-                    </router-link>
-                </li>
-                <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
-                    <router-link to="/tools" @click.native="checkToClosePanel">
-                        Linkedin / Tools
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/bench" @click.native="checkToClosePanel">
-                        Bench Status
-                    </router-link>
-                </li>
-                <li><a @click="logout">Logout</a></li>
-            </ul>
-        </div>
+  <div class="m-navbar__container  ">
+    <div v-if="!isNavOpen">
+      <button class="m-navbar__openPanelButton" @click.prevent="setNavPanelState(true)">
+        Menu
+      </button>
     </div>
+    <div v-else class="m-navbar__listWrapper ">
+      <ul class="p-0 m-0">
+        <li>
+          <router-link to="/dashboard" @click.native="checkToClosePanel">
+            Home
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/user/skills" @click.native="checkToClosePanel">
+            Self-Assessment
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/user/goals" @click.native="checkToClosePanel">
+            Set Goals
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/user/tribeverification" @click.native="checkToClosePanel">
+            Tribe Verification
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/skillsbreakdown" @click.native="checkToClosePanel">
+            Expertise Lookup
+          </router-link>
+        </li>
+        <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
+          <router-link to="/editgroups" @click.native="checkToClosePanel">
+            Edit Groups
+          </router-link>
+        </li>
+        <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
+          <router-link to="/debug" @click.native="checkToClosePanel">
+            Debug
+          </router-link>
+        </li>
+        <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
+          <router-link to="/tools" @click.native="checkToClosePanel">
+            Linkedin / Tools
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/bench" @click.native="checkToClosePanel">
+            Bench Status
+          </router-link>
+        </li>
+        <li><a @click="logout">Logout</a></li>
+      </ul>
+    </div>
+  </div>
 </template>
 <script>
-    import {mapState} from 'vuex';
+  import {mapState} from 'vuex';
+  import MSALAuthService from '../../authentication';
 
-    export default {
+  export default {
         name: "MNavbar",
         props: {
             isNavOpen: Boolean
@@ -79,13 +80,8 @@
             },
             logout: function () {
                 this.checkToClosePanel();
-                $adal.signOut();
-                fb.auth.signOut().then(() => {
-                    this.$store.dispatch('clearData');
-                    this.$router.push('/login');
-                }).catch(err => {
-                    console.log(err);
-                });
+              let authService = new MSALAuthService();
+              authService.logOut();
             }
         }
     };
