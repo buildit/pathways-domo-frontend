@@ -19,14 +19,14 @@ before_deploy:
   - mkdir -p ~/.ssh  &&  echo "Host *" > ~/.ssh/config && echo " StrictHostKeyChecking no" >> ~/.ssh/config
   - ssh-keyscan -H 18.224.56.34 >> ~/.ssh/known_hosts
 install:
-  - npm ci
+  - yarn install
 cache:
   directories:
     - "$HOME/.npm"
 jobs:
   include:
     - stage: build
-      script: npm run build
+      script: yarn run build
     - stage: deploy
       deploy:
         provider: script
