@@ -31,7 +31,7 @@ jobs:
         provider: script
         skip_cleanup: true
         local_dir: build
-        script: rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR/build/* pathwaysuser@pathways.buildit.systems:/home/pathwaysuser/pathways-frontend
+        script: rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR/dist/* pathwaysuser@pathways.buildit.systems:/home/pathwaysuser/pathways-frontend
         on:
           branch: dev-0.1
 stages:
