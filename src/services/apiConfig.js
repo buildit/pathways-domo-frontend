@@ -2,7 +2,8 @@ import axios from 'axios';
 import MSALAuthService from '../authentication';
 
 const config = {
-    baseUrl: 'http://localhost:5000/api',
+    //baseUrl: 'http://localhost:5000/api',
+    baseUrl: 'https://pathways.buildit.systems/api',
     userEndpoint: '/users',
     roleLevelEndpoint: '/roles/levels',
     roleTypeEndpoint: '/roles/types',
