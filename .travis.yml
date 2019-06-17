@@ -1,0 +1,39 @@
+language: node_js
+node_js:
+  - 11.14.0
+warnings_are_errors: true
+env:
+  global:
+    - SERVER_IP_ADDRESS=pathways.buildit.systems
+branches:
+  only:
+    - dev-0.1
+before_deploy:
+  - npm run build
+  - openssl aes-256-cbc -K $encrypted_35eb4322f8b7_key -iv $encrypted_35eb4322f8b7_iv -in pathwaysid_rsa.enc -out pathwaysid_rsa -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 ./pathwaysid_rsa
+  - ssh-add ./pathwaysid_rsa
+  - mkdir -p ~/.ssh  &&  echo "Host *" > ~/.ssh/config && echo " StrictHostKeyChecking no" >> ~/.ssh/config
+  - ssh-keyscan -H 18.224.56.34 >> ~/.ssh/known_hosts
+install:
+  - yarn install
+script: echo "npm test temporarily disabled"
+cache:
+  directories:
+    - "$HOME/.npm"
+jobs:
+  include:
+    - stage: build
+      script: yarn run build
+    - stage: deploy
+      deploy:
+        provider: script
+        skip_cleanup: true
+        local_dir: build
+        script: rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR/build/* pathwaysuser@pathways.buildit.systems:/home/pathwaysuser/pathways-frontend
+        on:
+          branch: dev-0.1
+stages:
+  - name: deploy
+    if: branch = dev-0.1

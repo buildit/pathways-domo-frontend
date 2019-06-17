@@ -7,7 +7,7 @@
     "start": "node server.js",
     "serve": "eslint \"src/**/*.{js,vue}\" && vue-cli-service serve",
     "serveLocal": "vue-cli-service serve --host 0.0.0.0 --port 3110",
-    "build": "vue-cli-service old.build",
+    "build": "vue-cli-service build",
     "lint": "eslint \"src/**/*.{js,vue}\"",
     "lint-fix": " eslint \"src/**/*.{js,vue}\" --fix"
   },
