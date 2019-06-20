@@ -4,6 +4,7 @@ import UserDetail from "./views/UserDetail";
 import Settings from "./views/Settings";
 import EditGroups from "./views/EditGroups";
 import Home from "./views/Home";
+import Help from "./views/Help";
 import SkillsBreakdown from "./views/SkillsBreakdown";
 import Bench from "./views/Bench";
 import Tools from "./views/Tools";
@@ -108,7 +109,16 @@ const router = new Router({
             meta: {
                 requireAuth: true
             }
+        },
+        {
+            path: '/help',
+            name: 'Help',
+            component: Help,
+            meta: {
+                requireAuth: true
+            }
         }
+
     ]
 });
 

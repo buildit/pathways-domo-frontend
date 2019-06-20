@@ -52,6 +52,11 @@
             Bench Status
           </router-link>
         </li>
+        <li>
+          <router-link to="/help" @click.native="checkToClosePanel">
+            Help
+          </router-link>
+        </li>
         <li><a @click="logout">Logout</a></li>
       </ul>
     </div>

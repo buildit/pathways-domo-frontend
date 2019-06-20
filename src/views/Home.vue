@@ -1,6 +1,9 @@
 <template>
   <div class="container">
     <div class="row">
+      <div class="col-12">
+
+      </div>
       <div class="linkSection__wrapper col-12 col-md-6">
         <div class="linkSection">
           <h2>
@@ -59,7 +62,8 @@
             Access Locked
           </h4>-->
           <p>
-            Setting the required skill levels to achieve each role level per tribe. This is a company-wide configuations </p>
+            Setting the required skill levels to achieve each role level per tribe. This is a company-wide
+            configuations </p>
         </div>
       </div>
       <div class="linkSection__wrapper col-12 col-md-6">
@@ -77,31 +81,33 @@
   </div>
 </template>
 <script>
-    import BenchWidget from "../components/molecules/m-benchWidget";
-    import {mapState} from "vuex";
-    import store from '../store';
+  import BenchWidget from "../components/molecules/m-benchWidget";
+  import { mapState } from "vuex";
+  import store from '../store';
 
-    const currentUser = function () {
-        return store.state.currentUser;
-    };
-    export default {
-        components: {BenchWidget},
-        data() {
-            return {};
-        },
-        computed: {
-            ...mapState([
-                'currentUser'
-            ]),
-        },
-        created: function () {
-            this.$emit('setLoadingState', true);
-        },
-        mounted: function () {
-            this.$emit('setLoadingState', false);
-        },
-        methods: {}
-    };
+
+  export default {
+    components: {BenchWidget},
+    data() {
+      return {};
+    },
+    computed: {
+      ...mapState([
+        'currentUser',
+
+      ]),
+
+    },
+    created: function () {
+      this.$emit('setLoadingState', true);
+    },
+    mounted: function () {
+      this.$emit('setLoadingState', false);
+    },
+    methods: {
+
+    }
+  };
 </script>
 <style scoped lang="scss">
   @import "@/styles/main.scss";
