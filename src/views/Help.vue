@@ -2,9 +2,6 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <pre>{{roleLevelRules[0]}}</pre>
-        <pre>{{skills[0]}}</pre>
-        <p>{{skillGroups}}</p>
 
         <template v-for="group in skillGroups">
           <h1>{{group.name}}</h1>
@@ -13,19 +10,18 @@
           <template v-for="role in roles">
 
             {{role.name}}
-            <ul >
-              <li v-for="skill in filteredSkillGroupRoles(group.id, role.id)">
-                {{skill.skillType.name}} {{skill.roleLevel.name}} {{skill.roleLevel.level}} {{skill.skillLevel.level}}
-              </li>
+            <ul>
+              <template v-for="skill in filteredSkillGroupRoles(group.id, role.id)">
+                <li v-if="skill.skillLevel.level > 0">{{skill.skillType.name}} {{skill.skillLevel.level}} vs {{findUserSkillLevel(skill.skillType.id)}}
+                </li>
+
+              </template>
             </ul>
           </template>
-
 
         </template>
 
 
-        <p>{{roleLevelRules.length}}</p>
-        <pre>{{filteredSkillGroupRoles(4)}}</pre>
 
         <h3>roles qq</h3>
         <pre>{{roles}}</pre>
@@ -34,11 +30,12 @@
         <pre>{{skillLevels}}</pre>
 
         <h3>skillGroups</h3>
-        <p>{{skillGroups}}</p>
-        <p>{{skills}}</p>
+        <pre>{{skillGroups}}</pre>
 
 
-        <p>{{ users}}</p>
+        <h3>users</h3>
+        <pre>{{ users[0]}}</pre>
+
       </div>
     </div>
   </div>
@@ -66,6 +63,8 @@
         "skillLevels",
         "skillGroups",
         "skills",
+        'userProfile',
+        'userRoles'
       ]),
     },
     created: function () {
@@ -79,11 +78,23 @@
         let newArray = [];
 
         for (let item of this.roleLevelRules) {
-          if (item.roleTypeId === sgId && item.roleLevelId === roleId){
+          if (item.roleTypeId === sgId && item.roleLevelId === roleId) {
             newArray.push(item);
           }
         }
         return newArray;
+      },
+      findUserSkillLevel: function (targetSkillId) {
+        //skill.skillType.id
+
+        let userSkill = this.userProfile.userSkills.find(sk => sk.skillTypeId === targetSkillId);
+        if (userSkill) {
+          const level = this.skillLevels.find(sl => sl.id === userSkill.skillLevelId)
+          return level.level;
+        } else {
+          return 0;
+        }
+
       }
     }
   };

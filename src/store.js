@@ -245,6 +245,14 @@ const store = new Vuex.Store({
                 });
 
                 const rolesRequest = api.Role().getAll().then(res => {
+                    let temp = res.data;
+
+                    temp.push ( {
+                        "level": 0,
+                        "description": "Not Relevant",
+                        "name": "Not Applicable",
+                        "id": 6
+                    });
                     store.commit('setRoles', res.data);
                 });
 
@@ -271,7 +279,6 @@ const store = new Vuex.Store({
                     });
             });
         },
-
         setUserRoles({commit, state}, data) {
             let userSkillSet = state.userProfile.userSkills;
             let userRoles = {};

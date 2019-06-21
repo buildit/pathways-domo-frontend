@@ -32,17 +32,17 @@
             Expertise Lookup
           </router-link>
         </li>
-        <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
+        <li>
           <router-link to="/editgroups" @click.native="checkToClosePanel">
             Edit Groups
           </router-link>
         </li>
-        <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
+        <li>
           <router-link to="/debug" @click.native="checkToClosePanel">
             Debug
           </router-link>
         </li>
-        <li v-if="currentUser.uid === 'pl1uHimMZ3YnSzqe5ExgCcLuo1J2'">
+        <li>
           <router-link to="/tools" @click.native="checkToClosePanel">
             Linkedin / Tools
           </router-link>

@@ -5,6 +5,7 @@ import Settings from "./views/Settings";
 import EditGroups from "./views/EditGroups";
 import Home from "./views/Home";
 import Help from "./views/Help";
+import Profile from "./views/Profile";
 import SkillsBreakdown from "./views/SkillsBreakdown";
 import Bench from "./views/Bench";
 import Tools from "./views/Tools";
@@ -60,6 +61,14 @@ const router = new Router({
             path: '/settings',
             name: 'Settings',
             component: Settings,
+            meta: {
+                requireAuth: true
+            }
+        },
+        {
+            path: '/profile',
+            name: 'Profile',
+            component: Profile,
             meta: {
                 requireAuth: true
             }

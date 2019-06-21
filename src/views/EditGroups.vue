@@ -2,49 +2,37 @@
   <div>
     <h1>Edit Groups</h1>
 
+
     <div class="row">
-      <ul
-        id=""
-        class="o-editGroups__cardContainer col-12"
-      >
-        <li v-for="(group, group_key) in skillGroups">
-          <h2>{{ group.name }}</h2>
+
+      <div class="col-12">
 
 
-          <table>
-            <tr>
-              <td></td>
-              <td
-                v-for="item in roles"
-                class="py-3"
-              >
-                {{ item.name }}
-              </td>
-            </tr>
+        <pre>{{skillsByRoleAndGroup[0]}}</pre>
 
-            <tr v-for="skill in group.skills">
-              <td class="px-3">
-                <h3>{{ skill.name }}</h3>
-              </td>
+        <div v-for="group in skillsByRoleAndGroup">
+          <h1>
+            {{group.roleTypeName}}
+          </h1>
 
-              <td
-                v-for="role in roles"
-                class="pr-4 py-3"
-              >
-                <button
-                  v-for="level in skillLevels"
-                  :id.prop="'button_'+group.sg_id+'_'+skill.s_id+'_'+role.r_id+'_'+level.sl_id"
-                  v-bind:class="{'-active': level.level===group['roles'][role.r_id]['skills'][skill.s_id]['level']}"
-                  @click="setSkill(level, group_key, skill, role)"
-                >
-                  {{ level.level }}
-                </button>
-                <!--:className.prop="'button_'+group.sg_id+'_'+skill.s_id+'_'+role.r_id"-->
-              </td>
-            </tr>
-          </table>
-        </li>
-      </ul>
+          <div v-for="(skill, skillName) in group.skills">
+            <h2>{{skillName}}</h2>
+            {{skill.roleLevelName}}
+
+
+            <div v-for="level in skill">
+              <h3>{{level.roleLevelName}}</h3>
+              {{level.skillLevel.level}}
+            </div>
+          </div>
+
+        </div>
+
+
+
+
+
+      </div>
     </div>
   </div>
 </template>
@@ -69,8 +57,82 @@
         'skillGroups',
         'skills',
         'skillLevels',
-        'roles'
-      ])
+        'roles',
+        'roleLevelRules'
+      ]),
+      skillsByRoleAndGroup: function () {
+        let temp = {};
+        // return temp;
+
+        /*
+        {
+  "roleTypeId": 1,
+  "roleType": {
+    "title": "Engineer",
+    "name": "Software Engineering",
+    "id": 1
+  },
+  "roleLevelId": 1,
+  "roleLevel": {
+    "level": 2,
+    "description": "e.g. Individuals with some level of experience in their Skill Group, who are able to work independently without supervision.",
+    "name": "Professional",
+    "id": 1
+  },
+  "skillTypeId": 1,
+  "skillType": {
+    "description": "",
+    "name": "Information security",
+    "id": 1
+  },
+  "skillLevelId": 4,
+  "skillLevel": {
+    "level": 4,
+    "description": "As above, but with demonstrated ability to lead others on the project engagement / activity their team is involved in",
+    "name": "Lead",
+    "id": 4
+  },
+  "essentialSkill": null
+}
+*/
+
+        let roleLevelObject = {};
+
+        for (let roleLevel of this.roles){
+
+          roleLevelObject[roleLevel.id] = {
+            roleLevelId: roleLevel.id,
+            roleLevelName: roleLevel.name,
+            skillLevel: {}
+          };
+        }
+
+        console.log(roleLevelObject);
+        for (let group of this.skillGroups){
+
+          temp[group.id] = {
+            roleTypeName: group.name,
+            roleTypeId: group.id,
+            skills: {}
+          };
+
+
+        }
+
+        for (let roleRule of this.roleLevelRules){
+          console.log(roleRule.roleTypeId, roleRule.roleLevelId, roleRule.skillType.name, roleRule.skillType.id);
+          if ( typeof  temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] === 'undefined'){
+            temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] = roleLevelObject;
+          }
+
+          temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name][roleRule.roleLevelId]['skillLevel'] = roleRule.skillLevel
+        }
+
+
+        return temp;
+
+
+      }
     },
     created: function () {
       this.$emit('setLoadingState', true);
@@ -109,6 +171,38 @@
         }).catch(err => {
           console.log(err);
         });
+      },
+      filterBySkillGroup: function (sgId) {
+        return this.roleLevelRules.filter(function (item) {
+          if (item.roleTypeId === sgId) {
+            return true;
+          }
+
+          return false;
+
+        });
+      },
+      filteredSkillGroupRoles: function (sgId, roleId) {
+        let newArray = [];
+
+        for (let item of this.roleLevelRules) {
+          if (item.roleTypeId === sgId && item.roleLevelId === roleId) {
+            newArray.push(item);
+          }
+        }
+        return newArray;
+      },
+      findUserSkillLevel: function (targetSkillId) {
+        //skill.skillType.id
+
+        let userSkill = this.userProfile.userSkills.find(sk => sk.skillTypeId === targetSkillId);
+        if (userSkill) {
+          const level = this.skillLevels.find(sl => sl.id === userSkill.skillLevelId);
+          return level.level;
+        } else {
+          return 0;
+        }
+
       }
     }
   };
@@ -118,105 +212,5 @@
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
-  h1 {
-    margin-bottom: space(4);
-  }
 
-  button {
-    @include deepShadow(8, colorViz(7), 30%);
-    border: 0;
-    border-radius: 0;
-    cursor: pointer;
-    flex-grow: 1;
-    font-weight: bold;
-    padding: space(1) space(2);
-    position: relative;
-
-    @for $i from 0 through 5 {
-      &:nth-child(#{$i}) {
-        z-index: #{$i};
-      }
-    }
-
-
-    &.-targetLevel {
-      @include deepShadow(8, colorViz(4), 10%);
-      border-radius: 0;
-    }
-
-    &.-active {
-      @include deepShadow(8, colorViz(5), 15%);
-      border-radius: 0;
-      transition: box-shadow 100ms;
-
-
-      &:active {
-        @include buttonshadowActive(colorViz(3), 15%);
-      }
-
-    }
-
-    &:active {
-      @include buttonshadowActive($light, 15%);
-    }
-
-    &:hover {
-      @include deepShadow(8, $primary, 15%);
-      border-radius: 0;
-    }
-
-
-    &:first-child {
-    border-radius:    $border-radius 0 0  $border-radius;
-
-      &:hover {
-      border-radius:    $border-radius 0 0  $border-radius;
-      }
-    }
-
-    &:last-child {
-    border-radius:   0  $border-radius  $border-radius 0;
-
-      &:hover {
-      border-radius:   0  $border-radius  $border-radius 0;
-      }
-    }
-  }
-
-  .o-editGroups {
-    &__cardContainer {
-      list-style: none;
-      overflow: auto;
-
-
-      @each $key, $color in $colorVisualization {
-        li:nth-child(#{$key}n) {
-          @include deepShadow(16, $color, 10%);
-          margin-bottom: space(4);
-          padding: space(4);
-        }
-
-
-      }
-    }
-  }
-
-  table {
-    width: 100%;
-    tr {
-      td:nth-child(n+1){
-        min-width: 10rem;
-      }
-    }
-    tr:nth-child(even) {
-      background-color: rgba($white, 50%);
-    }
-    tr:nth-child(odd) {
-      background-color: rgba($dark, 20%);
-    }
-    tr:first-child {
-      background-color: transparent;
-    }
-
-  }
 </style>
