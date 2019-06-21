@@ -15,21 +15,32 @@
             {{group.roleTypeName}}
           </h1>
 
-          <div v-for="(skill, skillName) in group.skills">
-            <h2>{{skillName}}</h2>
-            {{skill.roleLevelName}}
+          <table>
+            <tr>
+              <td></td>
+              <td v-for="role in roles">
+                {{role.name}}
+              </td>
+            </tr>
+
+            <tr v-for="(skill, skillName) in group.skills">
+              <td>{{skillName}}
 
 
-            <div v-for="level in skill">
-              <h3>{{level.roleLevelName}}</h3>
-              {{level.skillLevel.level}}
-            </div>
-          </div>
+
+              </td>
+              <!--            {{skill.roleLevelName}}-->
+
+
+              <td v-for="role in roles">
+                {{skill[role.id].skillLevel.level}}
+              </td>
+
+
+            </tr>
+          </table>
 
         </div>
-
-
-
 
 
       </div>
@@ -62,44 +73,10 @@
       ]),
       skillsByRoleAndGroup: function () {
         let temp = {};
-        // return temp;
-
-        /*
-        {
-  "roleTypeId": 1,
-  "roleType": {
-    "title": "Engineer",
-    "name": "Software Engineering",
-    "id": 1
-  },
-  "roleLevelId": 1,
-  "roleLevel": {
-    "level": 2,
-    "description": "e.g. Individuals with some level of experience in their Skill Group, who are able to work independently without supervision.",
-    "name": "Professional",
-    "id": 1
-  },
-  "skillTypeId": 1,
-  "skillType": {
-    "description": "",
-    "name": "Information security",
-    "id": 1
-  },
-  "skillLevelId": 4,
-  "skillLevel": {
-    "level": 4,
-    "description": "As above, but with demonstrated ability to lead others on the project engagement / activity their team is involved in",
-    "name": "Lead",
-    "id": 4
-  },
-  "essentialSkill": null
-}
-*/
-
         let roleLevelObject = {};
 
-        for (let roleLevel of this.roles){
-
+        for (let roleLevel of this.roles) {
+          console.log(roleLevel.name);
           roleLevelObject[roleLevel.id] = {
             roleLevelId: roleLevel.id,
             roleLevelName: roleLevel.name,
@@ -107,8 +84,8 @@
           };
         }
 
-        console.log(roleLevelObject);
-        for (let group of this.skillGroups){
+
+        for (let group of this.skillGroups) {
 
           temp[group.id] = {
             roleTypeName: group.name,
@@ -119,13 +96,13 @@
 
         }
 
-        for (let roleRule of this.roleLevelRules){
-          console.log(roleRule.roleTypeId, roleRule.roleLevelId, roleRule.skillType.name, roleRule.skillType.id);
-          if ( typeof  temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] === 'undefined'){
+        for (let roleRule of this.roleLevelRules) {
+
+          if (typeof temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] === 'undefined') {
             temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] = roleLevelObject;
           }
 
-          temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name][roleRule.roleLevelId]['skillLevel'] = roleRule.skillLevel
+          temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name][roleRule.roleLevelId]['skillLevel'] = roleRule.skillLevel;
         }
 
 
