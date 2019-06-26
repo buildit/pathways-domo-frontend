@@ -4,6 +4,7 @@ import UserDetail from "./views/UserDetail";
 import Settings from "./views/Settings";
 import EditGroups from "./views/EditGroups";
 import Home from "./views/Home";
+import Profile from "./views/Profile"
 import SkillsBreakdown from "./views/SkillsBreakdown";
 import Bench from "./views/Bench";
 import Tools from "./views/Tools";
@@ -27,6 +28,14 @@ const router = new Router({
             path: '/dashboard',
             name: 'Home',
             component: Home,
+            meta: {
+                requireAuth: true
+            }
+        },
+        {
+            path: '/profile',
+            name: 'Profile',
+            component: Profile,
             meta: {
                 requireAuth: true
             }

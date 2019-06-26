@@ -18,6 +18,11 @@
           </router-link>
         </li>
         <li>
+          <router-link to="/profile" @click.native="checkToClosePanel">
+            New Self-Assessment
+          </router-link>
+        </li>
+        <li>
           <router-link to="/user/goals" @click.native="checkToClosePanel">
             Set Goals
           </router-link>

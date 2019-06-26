@@ -1,189 +1,285 @@
 <template>
-  <div v-bind:class="{ 'd-flex' : isNavOpen}">
-    <loading-popover v-if="isLoading"></loading-popover>
-    <div class="o-mainWrapper__nav" v-bind:class="{ 'col-md-3' : isNavOpen, 'col-xl-2' : isNavOpen, 'panelLook': isNavOpen }">
-      <div v-if="isNavOpen" class="d-flex flex-row-reverse">
-        <button class="-closeButton" @click="setNavPanelState(false)">
-          X
-        </button>
-      </div>
-      <m-navbar v-if="currentUser" v-bind:isNavOpen="isNavOpen" @setNavPanelState="setNavPanelState"></m-navbar>
+  <div class="o-mainWrapper__container" v-bind:class="gridLayoutClassBinding">
+
+    <div class="o-mainWrapper__loadingContainer -gridItem">
+       <span v-if="isLoadingContainerOpen">
+            <LoadingPopover></LoadingPopover>
+       </span>
+
     </div>
-    <div v-bind:class="{ 'col-md-9' : isNavOpen, 'col-xl-10' : isNavOpen}">
-      <div class="d-flex">
-        <div class="o-mainWrapper col-12" v-bind:class="{'col-xl-8': isHelperPanelOpen}">
-          <router-view @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState"></router-view>
-        </div>
-        <transition name="width-change">
-          <div v-if="isHelperPanelOpen" class="o-helpPanel__wrapper p-0">
-            <div class="o-helpPanel__content px-4 pt-3">
-              <div class="d-flex flex-row-reverse">
-                <button class="-closeButton" @click="setHelpPanelState(false)">
-                  X
-                </button>
-              </div>
-              <o-help-panel__content class="p-4" v-bind:helpPanel_object="helpPanel_object" @setHelpPanelState="setHelpPanelState"></o-help-panel__content>
-            </div>
-          </div>
-        </transition>
-      </div>
+    <div class="o-mainWrapper__contentContainer -gridItem" @setGridLayout="setGridLayout">
+      <button v-if="!isContainContainerOpen" @click="setGridLayout('')">O</button>
+      <router-view v-if="isContainContainerOpen" @setGridLayout="setGridLayout"></router-view>
     </div>
+    <div class="o-mainWrapper__sidebarContainer -gridItem">
+      <button v-if="!isSidebarContainerOpen" @click="setGridLayout('-sidebarOpen')">O</button>
+      <button class="a-closePanel" @click="setGridLayout('')">Close Panel</button>
+
+      <span v-if="isSidebarContainerOpen">
+              <button @click="setGridLayout('-sidebarHelpOpen')">Sidebar Help</button>
+      </span>
+
+    </div>
+    <div class="o-mainWrapper__helpContainer -gridItem">
+      <button v-if="!isHelpContainerOpen" @click="setGridLayout('-helpOpen')">O</button>
+      <button class="a-closePanel" @click="setGridLayout('')">Close Panel</button>
+      
+      <span v-if="isHelpContainerOpen">
+ <button @click="setGridLayout('-sidebarHelpOpen')">Sidebar Help</button>
+      </span>
+    </div>
+
   </div>
 </template>
 <script>
-    import {mapState} from 'vuex';
-    import MNavbar from "./components/molecules/m-navbar";
-    import OHelpPanel__content from "./components/organisms/o-helpPanel__content";
-    import LoadingPopover from "./components/atoms/a-loadingPopover";
+  import { mapState } from 'vuex';
+  import MNavbar from "./components/molecules/m-navbar";
+  import OHelpPanel__content from "./components/organisms/o-helpPanel__content";
+  import LoadingPopover from "./components/atoms/a-loadingPopover";
 
-    export default {
-        components: {LoadingPopover, OHelpPanel__content, MNavbar},
-        props: {},
-        data() {
+  export default {
+    components: {LoadingPopover, OHelpPanel__content, MNavbar},
+    props: {},
+    data() {
+      return {
+        isLoading: false,
+        isNavOpen: true,
+        isHelperPanelOpen: false,
+        helpPanel_object: {},
+        gridLayoutClass: '-loading'
+      };
+    },
+    computed: {
+      ...mapState(['currentUser']),
+      gridLayoutClassBinding: function () {
+        switch (this.gridLayoutClass) {
+          case '-loading':
             return {
-                isLoading: false,
-                isNavOpen: true,
-                isHelperPanelOpen: false,
-                helpPanel_object: {}
+              '-loading': true
             };
-        },
-        computed: {
-            ...mapState(['currentUser'])
-        },
-        created() {
-
-        },
-        methods: {
-            setLoadingState(e) {
-                this.isLoading = e;
-            },
-            setNavPanelState(e) {
-                this.isNavOpen = e;
-                if (this.isNavOpen === true) {
-                    this.setHelpPanelState(false);
-                }
-            },
-            setHelpPanelState(e) {
-                this.isHelperPanelOpen = e;
-            },
-            setHelpPanelContent(e) {
-                this.setHelpPanelState(true);
-                this.setNavPanelState(false);
-                this.helpPanel_object = e;
-            }
+          case '-sidebarOpen':
+            return {
+              '-sidebarOpen': true
+            };
+          case '-helpOpen':
+            return {
+              '-helpOpen': true
+            };
+          case '-sidebarHelpOpen':
+            return {
+              '-sidebarHelpOpen': true
+            };
+          default:
+            return {};
         }
-    };
+      },
+      isLoadingContainerOpen: function () {
+
+        return (this.gridLayoutClass === '-loading');
+      },
+      isContainContainerOpen: function () {
+        return !(this.gridLayoutClass === '-loading' || this.gridLayoutClass === '-sidebarHelpOpen');
+
+
+      },
+      isSidebarContainerOpen: function () {
+        return this.gridLayoutClass === '-sidebarOpen' || this.gridLayoutClass === '-sidebarHelpOpen';
+
+
+      },
+      isHelpContainerOpen: function () {
+        return this.gridLayoutClass === '-helpOpen' || this.gridLayoutClass === '-sidebarHelpOpen';
+      }
+    },
+    created() {
+
+    },
+    mounted() {
+      this.gridLayoutClass = '';
+    },
+    methods: {
+      setLoadingState(e) {
+        this.isLoading = e;
+      },
+      setNavPanelState(e) {
+        this.isNavOpen = e;
+        if (this.isNavOpen === true) {
+          this.setHelpPanelState(false);
+        }
+      },
+      setHelpPanelState(e) {
+        this.isHelperPanelOpen = e;
+      },
+      setHelpPanelContent(e) {
+        this.setHelpPanelState(true);
+        this.setNavPanelState(false);
+        this.helpPanel_object = e;
+      },
+      setGridLayout: function (e) {
+        this.gridLayoutClass = e;
+      }
+    }
+  };
 </script>
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
+  .-gridItem {
+    min-height: 100vh;
+  }
+
+  .a-closePanel {
+    display: none;
+  }
+
   .o-mainWrapper {
-    padding-top: space(1);
-    transition: max-width $animation-medium;
+    &__container {
+      $skinnyColumn: 3rem;
 
-    &.col-12 {
-      transition-delay: $animation-medium;
-    }
+      display: grid;
+      grid-template-columns: $skinnyColumn 1fr repeat(2, $skinnyColumn);
 
-    &__nav {
-      &.panelLook {
-        background-color: colorViz(6);
-        height: 100vh;
-        max-width: 100vw;
-        overflow: hidden;
-        padding: space(4);
-        position: fixed;
-        right: 0;
-        width: 100vw;
-        z-index: $zindex-modal;
+      &.-loading {
+
+        grid-template-columns: 1fr repeat(3, $skinnyColumn);
       }
 
+      &.-sidebarOpen {
+        grid-template-columns: $skinnyColumn 3fr 2fr $skinnyColumn;
+      }
+
+      &.-helpOpen {
+        grid-template-columns: $skinnyColumn 3fr $skinnyColumn 2fr;
+      }
+
+      &.-sidebarHelpOpen {
+        grid-template-columns: repeat(2, $skinnyColumn) 1fr 1fr;
+      }
+    }
+
+    &__loadingContainer {
+      background-attachment: fixed;
+      background-image: url('./assets/banter-snaps-wOj5odhDOZ0-unsplash.jpg');
+      background-position: center;
+      background-size: cover;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-column-start: 1;
+      grid-row-start: 1;
+
+      LoadingPopover {
+        align-self: center;
+        justify-self: center;
+      }
+    }
+
+    &__contentContainer {
+      background-color: $white;
+      grid-column-start: 2;
+      grid-row-start: 1;
+      height: 300vh;
+      padding-top: space(4);
+    }
+
+    &__sidebarContainer {
+      background-color: colorViz(7);
+      grid-column-start: 3;
+      grid-row-start: 1;
+    }
+
+    &__helpContainer {
+      background-color: $black;
+      grid-column-start: 4;
+      grid-row-start: 1;
     }
   }
 
-  .o-helpPanel {
-    &__wrapper {
-      height: 100vh;
-      max-width: 100vw;
-      overflow: hidden;
-      position: fixed;
-      right: 0;
-      width: 100vw;
-      z-index: $zindex-sticky;
+  @media (max-width: 576px) {
+    .a-closePanel {
+      display: block;
     }
 
-    &__content {
-
-      background-color: $dark;
-      box-shadow: inset 1rem 0 #111;
-      color: $white;
-      height: 100vh;
-      overflow-x: hidden;
-      overflow-y: auto;
-      width: 100vw;
-
-    }
-
-    &__closeButton {
-
-    }
-  }
-
-  .-closeButton {
-    @include deepShadow(8, $light, 15%);
-    background-color: $white;
-    border: 0;
-    border-radius: 1rem;
-    font-weight: bold;
-    height: 2rem;
-    width: 2.125rem;
-
-    &:active {
-      @include buttonshadowActive($light, 15%);
-    }
-  }
-
-  .width-change-enter-active,
-  .width-change-leave-active {
-    transition: max-width $animation-slow;
-  }
-
-  .width-change-enter, .width-change-leave-to {
-    max-width: 0;
-  }
-
-  @media (min-width: 1024px) {
     .o-mainWrapper {
+      &__container {
+        display: block;
 
+        &.-loading {
+          .o-mainWrapper {
+            &__loadingContainer {
+              display: block;
+            }
 
-      &__nav {
-        &.panelLook {
-          background-color: colorViz(6);
-
-
-          overflow: auto;
-
-          position: sticky;
-          position: -webkit-sticky;
-          right: auto;
-          top: 0;
-          width: auto;
-
+            &__contentContainer,
+            &__sidebarContainer,
+            &__helpContainer {
+              display: none;
+            }
+          }
         }
 
+        &.-sidebarOpen {
+          .o-mainWrapper {
+            &__sidebarContainer  {
+              display: block;
+            }
+
+            &__contentContainer,
+            &__helpContainer ,
+            &__loadingContainer {
+              display: none;
+            }
+          }
+        }
+
+        &.-helpOpen {
+          .o-mainWrapper {
+            &__helpContainer  {
+              display: block;
+            }
+
+            &__contentContainer,
+            &__sidebarContainer,
+            &__loadingContainer {
+              display: none;
+            }
+          }
+        }
+
+        &.-sidebarHelpOpen {
+          .o-mainWrapper {
+            &__helpContainer  {
+              display: block;
+            }
+
+            &__contentContainer,
+            &__sidebarContainer,
+            &__loadingContainer {
+              display: none;
+            }
+          }
+        }
+      }
+
+      &__loadingContainer {
+        display: none;
+      }
+
+      &__contentContainer {
+        display: block;
+        position: relative;
+      }
+
+      &__sidebarContainer {
+        display: none;
+        position: relative;
+      }
+
+      &__helpContainer {
+        display: none;
+        position: relative;
       }
     }
-
   }
 
-  @media (min-width: 1200px) {
 
-    .o-helpPanel {
-      &__wrapper,
-      &__content {
-        width: 33vw;
-      }
-
-    }
-  }
 </style>
