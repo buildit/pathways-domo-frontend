@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <h1>Edit Groups</h1>
 
 
@@ -8,32 +9,31 @@
       <div class="col-12">
 
 
-        <pre>{{skillsByRoleAndGroup[0]}}</pre>
-
         <div v-for="group in skillsByRoleAndGroup">
           <h1>
-            {{group.roleTypeName}}
+            {{group.roleTypeName}} {{group.roleTypeId}}
           </h1>
 
           <table>
             <tr>
               <td></td>
               <td v-for="role in roles">
-                {{role.name}}
+                {{role.name}} {{role.id}}
               </td>
             </tr>
 
-            <tr v-for="(skill, skillName) in group.skills">
-              <td>{{skillName}}
+
+
+            <tr v-for="(skillObject, skillName) in group.skills">
+              <td>{{skillName}} {{skillObject.skillType.id}}
 
 
 
               </td>
-              <!--            {{skill.roleLevelName}}-->
-
 
               <td v-for="role in roles">
-                {{skill[role.id].skillLevel.level}}
+                {{skillObject['roles'][role.id].skillLevel.level}}
+                {{skillObject['roles'][role.id].skillLevel.id}}
               </td>
 
 
@@ -76,7 +76,7 @@
         let roleLevelObject = {};
 
         for (let roleLevel of this.roles) {
-          console.log(roleLevel.name);
+
           roleLevelObject[roleLevel.id] = {
             roleLevelId: roleLevel.id,
             roleLevelName: roleLevel.name,
@@ -99,10 +99,19 @@
         for (let roleRule of this.roleLevelRules) {
 
           if (typeof temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] === 'undefined') {
-            temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] = roleLevelObject;
+            temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name] = {
+              'skillType': roleRule.skillType,
+              'roles': roleLevelObject
+            }
+
           }
 
-          temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name][roleRule.roleLevelId]['skillLevel'] = roleRule.skillLevel;
+          if (roleRule.roleTypeId === 1 && roleRule.skillType.id === 1){
+            console.log(roleRule);
+          }
+
+
+          temp[roleRule.roleTypeId]['skills'][roleRule.skillType.name]['roles'][roleRule.roleLevelId]['skillLevel'] = roleRule.skillLevel;
         }
 
 

@@ -12,7 +12,7 @@
     <div v-bind:class="{ 'col-md-9' : isNavOpen, 'col-xl-10' : isNavOpen}">
       <div class="d-flex">
         <div class="o-mainWrapper col-12" v-bind:class="{'col-xl-8': isHelperPanelOpen}">
-          <router-view @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState"></router-view>
+          <router-view @setHelpPanelContent="setHelpPanelContent" @setLoadingState="setLoadingState" @setNavPanelState="setNavPanelState"></router-view>
         </div>
         <transition name="width-change">
           <div v-if="isHelperPanelOpen" class="o-helpPanel__wrapper p-0">

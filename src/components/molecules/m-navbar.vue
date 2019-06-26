@@ -53,8 +53,13 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/help" @click.native="checkToClosePanel">
-            Help
+        <router-link to="/help" @click.native="checkToClosePanel">
+          Help
+        </router-link>
+      </li>
+        <li>
+          <router-link to="/profile" @click.native="checkToClosePanel">
+            New Assessments
           </router-link>
         </li>
         <li><a @click="logout">Logout</a></li>

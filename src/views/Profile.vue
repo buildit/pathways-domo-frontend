@@ -1,5 +1,8 @@
 <template>
-  <div class="container">
+  <div>
+    <div class="o-profile__assessment"></div>
+    <div class="o-profile__sidebar"></div>
+    <div class="o-profile__help"></div>
 
   </div>
 </template>
@@ -27,6 +30,7 @@
     },
     mounted: function () {
       this.$emit('setLoadingState', false);
+      this.$emit('setNavPanelState', false);
     },
     methods: {
 
@@ -36,5 +40,25 @@
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
+  .o-profile {
+    &__assessment {
+      background-color: colorViz(6);
+      background-image: url('../assets/sand_texture.png');
+      background-repeat: repeat;
+      height: 200vh;
+      width: 200vw;
+    }
 
+    &__sidebar {
+      background-color: colorViz(6);
+      background-image: url('../assets/sand_texture_light.png');
+      background-repeat: repeat;
+      height: 200vh;
+      width: 200vw;
+    }
+
+    &__help {
+
+    }
+  }
 </style>

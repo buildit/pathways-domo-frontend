@@ -2,6 +2,10 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
+        <pre>
+           {{roleLevelRules}}
+        </pre>
+
 
         <template v-for="group in skillGroups">
           <h1>{{group.name}}</h1>
