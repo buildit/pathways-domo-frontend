@@ -9,11 +9,12 @@
     </div>
     <div class="o-mainWrapper__contentContainer -gridItem" @setGridLayout="setGridLayout">
       <button v-if="!isContainContainerOpen" @click="setGridLayout('')">O</button>
-      <router-view v-if="isContainContainerOpen" @setGridLayout="setGridLayout"></router-view>
+      <router-view v-if="isContainContainerOpen" @setGridLayout="setGridLayout"
+                   @setHelpPanelContent="setHelpPanelContent"></router-view>
     </div>
     <div class="o-mainWrapper__sidebarContainer -gridItem">
       <button v-if="!isSidebarContainerOpen" @click="setGridLayout('-sidebarOpen')">O</button>
-      <button class="a-closePanel" @click="setGridLayout('')">Close Panel</button>
+      <button v-if="isSidebarContainerOpen" @click="setGridLayout('')">Close Panel</button>
 
       <span v-if="isSidebarContainerOpen">
               <button @click="setGridLayout('-sidebarHelpOpen')">Sidebar Help</button>
@@ -22,10 +23,12 @@
     </div>
     <div class="o-mainWrapper__helpContainer -gridItem">
       <button v-if="!isHelpContainerOpen" @click="setGridLayout('-helpOpen')">O</button>
-      <button class="a-closePanel" @click="setGridLayout('')">Close Panel</button>
-      
+      <button v-if="isHelpContainerOpen" @click="setGridLayout('')">Close Panel</button>
+
       <span v-if="isHelpContainerOpen">
- <button @click="setGridLayout('-sidebarHelpOpen')">Sidebar Help</button>
+        <button @click="setGridLayout('-sidebarHelpOpen')">Sidebar Help</button>
+
+        <OHelpPanel__content v-bind:helpPanel_object="helpPanel_object"></OHelpPanel__content>
       </span>
     </div>
 
@@ -111,8 +114,7 @@
         this.isHelperPanelOpen = e;
       },
       setHelpPanelContent(e) {
-        this.setHelpPanelState(true);
-        this.setNavPanelState(false);
+        this.gridLayoutClass = '-helpOpen';
         this.helpPanel_object = e;
       },
       setGridLayout: function (e) {
@@ -128,9 +130,6 @@
     min-height: 100vh;
   }
 
-  .a-closePanel {
-    display: none;
-  }
 
   .o-mainWrapper {
     &__container {
@@ -185,6 +184,7 @@
       background-color: colorViz(7);
       grid-column-start: 3;
       grid-row-start: 1;
+
     }
 
     &__helpContainer {
@@ -195,9 +195,6 @@
   }
 
   @media (max-width: 576px) {
-    .a-closePanel {
-      display: block;
-    }
 
     .o-mainWrapper {
       &__container {
@@ -219,12 +216,12 @@
 
         &.-sidebarOpen {
           .o-mainWrapper {
-            &__sidebarContainer  {
+            &__sidebarContainer {
               display: block;
             }
 
             &__contentContainer,
-            &__helpContainer ,
+            &__helpContainer,
             &__loadingContainer {
               display: none;
             }
@@ -233,7 +230,7 @@
 
         &.-helpOpen {
           .o-mainWrapper {
-            &__helpContainer  {
+            &__helpContainer {
               display: block;
             }
 
@@ -247,7 +244,7 @@
 
         &.-sidebarHelpOpen {
           .o-mainWrapper {
-            &__helpContainer  {
+            &__helpContainer {
               display: block;
             }
 
@@ -271,11 +268,13 @@
 
       &__sidebarContainer {
         display: none;
+        max-width: none;
         position: relative;
       }
 
       &__helpContainer {
         display: none;
+        max-width: none;
         position: relative;
       }
     }

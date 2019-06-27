@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="row">
+
       <div class="linkSection__wrapper col-12 col-md-6">
         <div class="linkSection">
           <h2>
@@ -73,6 +74,14 @@
             Pulling from DOMO, looks for people with no booked hours. </p>
         </div>
       </div>
+      <div class="linkSection__wrapper col-12 col-md-6">
+        <div class="linkSection">
+          <h2>
+            <a @click="logout">Logout</a>
+          </h2>
+
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -80,6 +89,7 @@
     import BenchWidget from "../components/molecules/m-benchWidget";
     import {mapState} from "vuex";
     import store from '../store';
+    import MSALAuthService from '../authentication';
 
     const currentUser = function () {
         return store.state.currentUser;
@@ -100,7 +110,13 @@
         mounted: function () {
             this.$emit('setLoadingState', false);
         },
-        methods: {}
+        methods: {
+          logout: function () {
+
+            let authService = new MSALAuthService();
+            authService.logOut();
+          }
+        }
     };
 </script>
 <style scoped lang="scss">
