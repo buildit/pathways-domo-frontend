@@ -55,7 +55,7 @@
         if (skillEntry.description.length > 0) {
           string += '<p>' + skillEntry.description + '</p>';
         }
-        
+
         let skillLevels = this.roleLevelRules.filter(item => item.skillTypeId === this.helpPanel_object.id);
         skillLevels = skillLevels.sort((a, b) => a.roleLevel.level - b.roleLevel.level);
 
@@ -69,7 +69,7 @@
         return string;
       },
       constructGroupObject: function () {
-        let string = this.skillGroups[this.helpPanel_object.id].name + "\n\n";
+        let string = '<h1>' + this.skillGroups.find(item => item.id === this.helpPanel_object.id).name + '</h1> ';
 
 
         let orderedRoles = this.roles.sort((a, b) => a.level - b.level);

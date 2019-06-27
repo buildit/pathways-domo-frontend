@@ -7,6 +7,7 @@
 
         <div v-for="group in skillGroups">
           <h2>
+            {{group}}
             {{group.name}}
             <a-help-button v-bind:id="group.id" v-bind:type="'group'"
                            @setHelpPanelContent="setHelpPanelContent"></a-help-button>
