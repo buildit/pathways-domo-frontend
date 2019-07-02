@@ -122,13 +122,13 @@
       flex-grow: 1;
 
       button {
-        @include deepShadow(8, colorViz(7), 30%);
+        background-color: rgba($white, 50%);
         border: 0;
         border-radius: 0;
         cursor: pointer;
         flex-grow: 1;
-        font-weight: bold;
-        padding: space(1) space(2);
+        max-height: space(6);
+        padding: space(1) space(3);
 
         @for $i from 0 through 5 {
           &:nth-child(#{$i}) {
@@ -137,47 +137,32 @@
         }
 
         &.-targetLevel {
-          @include deepShadow(8, colorViz(4), 10%);
-          border-radius: 0;
+
         }
 
         &.-active {
-          @include deepShadow(8, colorViz(5), 15%);
-          border-radius: 0;
+          background-color: rgba($white, 75%);
+          font-weight: bold;
           transition: box-shadow 100ms;
 
 
           &:active {
-            @include buttonshadowActive(colorViz(3), 15%);
+
           }
 
         }
 
         &:active {
-          @include buttonshadowActive($light, 15%);
+
         }
 
         &:hover {
-          @include deepShadow(8, $primary, 15%);
-          border-radius: 0;
+          background-color: colorViz(7);
+
         }
 
 
-        &:first-child {
-          border-radius: $border-radius 0 0 $border-radius;
 
-          &:hover {
-            border-radius: $border-radius 0 0 $border-radius;
-          }
-        }
-
-        &:last-child {
-          border-radius: 0 $border-radius $border-radius 0;
-
-          &:hover {
-            border-radius: 0 $border-radius $border-radius 0;
-          }
-        }
       }
     }
   }

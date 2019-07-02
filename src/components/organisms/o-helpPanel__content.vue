@@ -50,7 +50,7 @@
 
         console.log(skillEntry);
 
-        let string = '<h1>' + skillEntry.name + "</h1>";
+        let string = '<h2>' + skillEntry.name + "</h2>";
 
         if (skillEntry.description.length > 0) {
           string += '<p>' + skillEntry.description + '</p>';
@@ -59,7 +59,7 @@
         let skillLevels = this.roleLevelRules.filter(item => item.skillTypeId === this.helpPanel_object.id);
         skillLevels = skillLevels.sort((a, b) => a.roleLevel.level - b.roleLevel.level);
 
-        string += '<h2>Required Levels For Each Role</h2>';
+        string += '<h3>Required Levels For Each Role</h3>';
 
         string += '<ul>';
         for (let item of skillLevels) {
@@ -69,7 +69,7 @@
         return string;
       },
       constructGroupObject: function () {
-        let string = '<h1>' + this.skillGroups.find(item => item.id === this.helpPanel_object.id).name + '</h1> ';
+        let string = '<h2>' + this.skillGroups.find(item => item.id === this.helpPanel_object.id).name + '</h2> ';
 
 
         let orderedRoles = this.roles.sort((a, b) => a.level - b.level);
@@ -99,7 +99,7 @@
         string += '</tr>';
         for (let skillItem of filteredObject) {
           string += '<tr>';
-          string += '<td>' + skillItem.skillType.name + "</td>";
+          string += '<td>' + skillItem.skillType.name + '</td>';
 
           for (let roleItem in orderedRoles){
 
@@ -115,7 +115,6 @@
           }
 
           string += '</tr>';
-          string +=  "\n";
         }
         string += '</table>';
 
@@ -134,7 +133,19 @@
   .OHelpPanel {
     &__container {
       color: $white;
+      padding: space(4);
+      position: sticky;
+      top: 0;
     }
   }
 
+
+  @media (max-width: 576px) {
+    .OHelpPanel {
+      &__container {
+        position: relative;
+        top: auto;
+      }
+    }
+  }
 </style>

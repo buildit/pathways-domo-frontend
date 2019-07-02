@@ -23,28 +23,30 @@
   @import "@/styles/main.scss";
 
   .__moreInfo {
-    @include deepShadow(6, $primary, 15%);
+    $size: 1.5rem;
+
+    background-color: colorViz(0);
     border-radius: 1rem;
     color: $white;
     display: inline;
     flex-grow: 0;
+    font-size: 0.875rem;
     font-weight: bold;
-    height: 2rem;
+    height: $size;
     margin-left: space(2);
-    min-height: 2rem;
-    min-width: 2rem;
+    min-height: $size;
+    min-width: $size;
     text-align: center;
-    width: 2rem;
+    width: $size;
 
 
     &:hover {
-      background-color: $white;
-      color: $primary;
+      background-color: lighten(colorViz(0), 10%);
       text-decoration: none;
     }
 
     &:active {
-      @include buttonshadowActive($white, 50%);
+
     }
   }
 </style>

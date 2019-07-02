@@ -3,12 +3,15 @@
 }
 
 h1 {
-	line-height: 2rem;
-
+	font-size: 4rem;
+	line-height: 3.75rem;
+	margin: 0 0 space(4);
 }
 
 h2 {
-
+	font-size: 3rem;
+	line-height: 2.75rem;
+	margin: 0 0 space(4);
 }
 
 p {
@@ -29,4 +32,8 @@ a:not([href]):not([tabindex]) {
 		color: $medium;
 
 	}
+}
+
+.-bold {
+	font-size: bold;
 }

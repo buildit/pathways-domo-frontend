@@ -127,7 +127,9 @@
   @import "@/styles/main.scss";
 
   .-gridItem {
+
     min-height: 100vh;
+
   }
 
 
@@ -136,7 +138,9 @@
       $skinnyColumn: 3rem;
 
       display: grid;
+
       grid-template-columns: $skinnyColumn 1fr repeat(2, $skinnyColumn);
+
 
       &.-loading {
 
@@ -174,10 +178,11 @@
 
     &__contentContainer {
       background-color: $white;
+      box-shadow: 0 0 1rem 0 $black;
       grid-column-start: 2;
       grid-row-start: 1;
-      height: 300vh;
       padding-top: space(4);
+      z-index: 10;
     }
 
     &__sidebarContainer {
