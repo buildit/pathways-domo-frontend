@@ -1,13 +1,13 @@
 <template>
-  <div class="d-flex justify-content-between m-0 p-0">
-    <button v-for="(thisLevel) in skillLevels" :style="'z-index:'+thisLevel.level"
-            v-bind:class="{'-active': isActive[thisLevel.level],'-targetLevel': targetLevel[thisLevel.level]}" @click.stop="setSkill(thisLevel)">
-      {{ thisLevel.level }}
-    </button>
-  </div>
+    <div class="d-flex justify-content-between m-0 p-0">
+        <button v-for="(thisLevel) in skillLevels" :style="'z-index:'+thisLevel.level" v-bind:class="{'-active': isActive[thisLevel.level],'-targetLevel': targetLevel[thisLevel.level]}" @click.stop="setSkill(thisLevel)">
+            {{ thisLevel.level }}
+        </button>
+    </div>
 </template>
 <script>
     import {mapState} from 'vuex';
+    import Api from '../../services/apiConfig';
 
     export default {
         name: "o-skillLevel__panel",
@@ -95,7 +95,14 @@
         methods: {
             setSkill(targetLevel) {
                 let targetSkill = {};
-
+                let api = new Api();
+                let userSkill = {
+                    skillTypeId: this.skill_key,
+                    skillLevelId: targetLevel.id
+                };
+                api.initialize().then(a => a.UserSkill().setUserSkill(userSkill));
+                console.log(targetLevel);
+                console.log(this.skill_key);
                 targetSkill[this.skill_key] = {
                     sg_id: this.group_key,
                     group_name: this.group.name,
@@ -110,75 +117,75 @@
     };
 </script>
 <style scoped lang="scss">
-  @import "@/styles/main.scss";
+    @import "@/styles/main.scss";
 
 
-  ul {
-    list-style: none;
-    margin-left: -0.5rem;
+    ul {
+        list-style: none;
+        margin-left: -0.5rem;
 
-    li {
-      display: inline-block;
-      flex-grow: 1;
+        li {
+            display: inline-block;
+            flex-grow: 1;
 
-      button {
-        @include deepShadow(8, colorViz(7), 30%);
-        border: 0;
-        border-radius: 0;
-        cursor: pointer;
-        flex-grow: 1;
-        font-weight: bold;
-        padding: space(1) space(2);
+            button {
+                @include deepShadow(8, colorViz(7), 30%);
+                border: 0;
+                border-radius: 0;
+                cursor: pointer;
+                flex-grow: 1;
+                font-weight: bold;
+                padding: space(1) space(2);
 
-        @for $i from 0 through 5 {
-          &:nth-child(#{$i}) {
-            z-index: #{$i};
-          }
+                @for $i from 0 through 5 {
+                    &:nth-child(#{$i}) {
+                        z-index: #{$i};
+                    }
+                }
+
+                &.-targetLevel {
+                    @include deepShadow(8, colorViz(4), 10%);
+                    border-radius: 0;
+                }
+
+                &.-active {
+                    @include deepShadow(8, colorViz(5), 15%);
+                    border-radius: 0;
+                    transition: box-shadow 100ms;
+
+
+                    &:active {
+                        @include buttonshadowActive(colorViz(3), 15%);
+                    }
+
+                }
+
+                &:active {
+                    @include buttonshadowActive($light, 15%);
+                }
+
+                &:hover {
+                    @include deepShadow(8, $primary, 15%);
+                    border-radius: 0;
+                }
+
+
+                &:first-child {
+                    border-radius: $border-radius 0 0 $border-radius;
+
+                    &:hover {
+                        border-radius: $border-radius 0 0 $border-radius;
+                    }
+                }
+
+                &:last-child {
+                    border-radius: 0 $border-radius $border-radius 0;
+
+                    &:hover {
+                        border-radius: 0 $border-radius $border-radius 0;
+                    }
+                }
+            }
         }
-
-        &.-targetLevel {
-          @include deepShadow(8, colorViz(4), 10%);
-          border-radius: 0;
-        }
-
-        &.-active {
-          @include deepShadow(8, colorViz(5), 15%);
-          border-radius: 0;
-          transition: box-shadow 100ms;
-
-
-          &:active {
-            @include buttonshadowActive(colorViz(3), 15%);
-          }
-
-        }
-
-        &:active {
-          @include buttonshadowActive($light, 15%);
-        }
-
-        &:hover {
-          @include deepShadow(8, $primary, 15%);
-          border-radius: 0;
-        }
-
-
-        &:first-child {
-          border-radius: $border-radius 0 0 $border-radius;
-
-          &:hover {
-            border-radius: $border-radius 0 0 $border-radius;
-          }
-        }
-
-        &:last-child {
-          border-radius: 0 $border-radius $border-radius 0;
-
-          &:hover {
-            border-radius: 0 $border-radius $border-radius 0;
-          }
-        }
-      }
     }
-  }
 </style>

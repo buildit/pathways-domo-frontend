@@ -144,7 +144,6 @@ class RoleLevelRulesApi extends ApiBase {
     }
 }
 
-
 class UserSkillApi extends ApiBase {
     constructor(t) {
         super(t);
