@@ -1,13 +1,13 @@
 <template>
-  <div class="d-flex justify-content-between m-0 p-0">
-    <button v-for="(thisLevel) in skillLevels" :style="'z-index:'+thisLevel.level"
-            v-bind:class="{'-active': isActive[thisLevel.level],'-targetLevel': targetLevel[thisLevel.level]}" @click.stop="setSkill(thisLevel)">
-      {{ thisLevel.level }}
-    </button>
-  </div>
+    <div class="d-flex justify-content-between m-0 p-0">
+        <button v-for="(thisLevel) in skillLevels" :style="'z-index:'+thisLevel.level" v-bind:class="{'-active': isActive[thisLevel.level],'-targetLevel': targetLevel[thisLevel.level]}" @click.stop="setSkill(thisLevel)">
+            {{ thisLevel.level }}
+        </button>
+    </div>
 </template>
 <script>
     import {mapState} from 'vuex';
+    import Api from '../../services/apiConfig';
 
     export default {
         name: "o-skillLevel__panel",
@@ -95,7 +95,14 @@
         methods: {
             setSkill(targetLevel) {
                 let targetSkill = {};
-
+                let api = new Api();
+                let userSkill = {
+                    skillTypeId: this.skill_key,
+                    skillLevelId: targetLevel.id
+                };
+                api.initialize().then(a => a.UserSkill().setUserSkill(userSkill));
+                console.log(targetLevel);
+                console.log(this.skill_key);
                 targetSkill[this.skill_key] = {
                     sg_id: this.group_key,
                     group_name: this.group.name,
@@ -110,16 +117,16 @@
     };
 </script>
 <style scoped lang="scss">
-  @import "@/styles/main.scss";
+    @import "@/styles/main.scss";
 
 
-  ul {
-    list-style: none;
-    margin-left: -0.5rem;
+    ul {
+        list-style: none;
+        margin-left: -0.5rem;
 
-    li {
-      display: inline-block;
-      flex-grow: 1;
+        li {
+            display: inline-block;
+            flex-grow: 1;
 
       button {
         background-color: rgba($white, 50%);
@@ -130,11 +137,11 @@
         max-height: space(6);
         padding: space(1) space(3);
 
-        @for $i from 0 through 5 {
-          &:nth-child(#{$i}) {
-            z-index: #{$i};
-          }
-        }
+                @for $i from 0 through 5 {
+                    &:nth-child(#{$i}) {
+                        z-index: #{$i};
+                    }
+                }
 
         &.-targetLevel {
 
@@ -150,7 +157,7 @@
 
           }
 
-        }
+                }
 
         &:active {
 
@@ -165,5 +172,4 @@
 
       }
     }
-  }
 </style>

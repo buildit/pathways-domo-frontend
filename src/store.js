@@ -147,9 +147,10 @@ const store = new Vuex.Store({
                 api.User().get(state.currentUser.mail).then(res => {
 
                     console.log('committing ' + res.data.username);
-                    if (res.data.directoryName == null) {
-                        res.data.directoryName = state.currentUser.name;
-                        res.data.name = state.currentUser.name.replace(' (Digital)', '');
+                    if (res.data.directoryName == null || res.data.organizationId == null) {
+                        res.data.directoryName = state.currentUser.displayName;
+                        res.data.organizationId = state.currentUser.userPrincipalName;
+                        res.data.name = state.currentUser.displayName.replace(' (Digital)', '');
                         store.dispatch('updateProfile', res.data);
                     }
 
@@ -169,10 +170,13 @@ const store = new Vuex.Store({
             });
         },
         updateProfile({commit, state}, data) {
-            api.User().update(data).then(user => {
-                console.log('User profile updated.');
-            }).catch(err => {
-                console.log(err);
+            let api = new Api();
+            api.initialize().then((ret) => {
+                ret.User().update(data).then(user => {
+                    console.log('User profile updated.');
+                }).catch(err => {
+                    console.log(err);
+                });
             });
         },
         updateUserRoleLevels({commit, state}) {
@@ -317,36 +321,39 @@ const store = new Vuex.Store({
                 // get map of skills for this skill group
                 let skillRules = rulesMap[sg.id];
 
-                // look through each of the non-n/a role possibilities
-                orderedRoles.forEach(r => {
-                    let required = skillRules.rLevels[r.id];
+                // Deferring this behavior
+                if (false) {
+                    // look through each of the non-n/a role possibilities
+                    orderedRoles.forEach(r => {
+                        let required = skillRules.rLevels[r.id];
 
-                    // default to true, and let the list prove wrong
-                    let metRequirement = true;
+                        // default to true, and let the list prove wrong
+                        let metRequirement = true;
 
-                    // go through each required skill for this role level
-                    required.forEach(r => {
-                        // find the skill in the user's list if it exists
-                        let userSkill = userSkillSet.find(s => s.skillTypeId === r.type);
+                        // go through each required skill for this role level
+                        required.forEach(r => {
+                            // find the skill in the user's list if it exists
+                            let userSkill = userSkillSet.find(s => s.skillTypeId === r.type);
 
-                        if (userSkill && metRequirement) {
-                            // user skill exists, does the user meet or exceed the required level? If not, they do not get a promotion.
-                            let requiredLevel = r.level.level;
-                            let userLevel = skillLevels.find(s => s.id == userSkill.skillLevelId);
-                            if (userLevel.level >= requiredLevel) {
-                                metRequirement = true;
+                            if (userSkill && metRequirement) {
+                                // user skill exists, does the user meet or exceed the required level? If not, they do not get a promotion.
+                                let requiredLevel = r.level.level;
+                                let userLevel = skillLevels.find(s => s.id == userSkill.skillLevelId);
+                                if (userLevel.level >= requiredLevel) {
+                                    metRequirement = true;
+                                } else {
+                                    metRequirement = false;
+                                }
                             } else {
                                 metRequirement = false;
                             }
-                        } else {
-                            metRequirement = false;
+                        });
+
+                        if (metRequirement) {
+                            userRoles[sg.id] = {sg: sg, level: r};
                         }
                     });
-
-                    if (metRequirement) {
-                        userRoles[sg.id] = {sg: sg, level: r};
-                    }
-                });
+                }
             });
 
             store.commit('setSkillGroupSkills', skillGroupSkillSet);
