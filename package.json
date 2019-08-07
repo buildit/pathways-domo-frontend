@@ -38,8 +38,10 @@
     "fibers": "4.0.1",
     "jquery": "latest",
     "node-sass": "^4.11.0",
+    "popper.js": "^1.15.0",
     "sass-loader": "^7.1.0",
-    "vue-template-compiler": "^2.5.21"
+    "vue-template-compiler": "^2.5.21",
+    "webpack": "^4.36.1"
   },
   "postcss": {
     "plugins": {
